@@ -7,7 +7,7 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:588713240952:android:jayti_companion",
+        "mobilesdk_app_id": "1:588713240952:android:c585bf5d532a9026fe008d",
         "android_client_info": {
           "package_name": "com.jayti.companion"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCSrVXiA9_AR_Asp-1h4KeRTWxG0758KA4"
+          "current_key": "AIzaSyB2dqp4pDi2weJhlIBcsHZeDHzLDWCyLe0"
         }
       ],
       "services": {

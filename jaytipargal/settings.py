@@ -481,15 +481,15 @@ FIREBASE_ENABLED = all([
 # Firebase Admin configuration for Railway-hosted backend integrations
 FIREBASE_PRIVATE_KEY_ID = os.environ.get('FIREBASE_PRIVATE_KEY_ID', '')
 FIREBASE_PRIVATE_KEY = os.environ.get('FIREBASE_PRIVATE_KEY', '').replace('\\n', '\n')
-FIREBASE_CLIENT_EMAIL = os.environ.get('FIREBASE_CLIENT_EMAIL', '')
-FIREBASE_CLIENT_ID = os.environ.get('FIREBASE_CLIENT_ID', '')
+FIREBASE_CLIENT_EMAIL = os.environ.get('FIREBASE_CLIENT_EMAIL', 'firebase-adminsdk-fbsvc@jpfinal-c9340.iam.gserviceaccount.com')
+FIREBASE_CLIENT_ID = os.environ.get('FIREBASE_CLIENT_ID', '105251916594792438445')
 FIREBASE_AUTH_URI = os.environ.get('FIREBASE_AUTH_URI', 'https://accounts.google.com/o/oauth2/auth')
 FIREBASE_TOKEN_URI = os.environ.get('FIREBASE_TOKEN_URI', 'https://oauth2.googleapis.com/token')
 FIREBASE_AUTH_PROVIDER_CERT_URL = os.environ.get(
     'FIREBASE_AUTH_PROVIDER_CERT_URL',
     'https://www.googleapis.com/oauth2/v1/certs',
 )
-FIREBASE_CLIENT_CERT_URL = os.environ.get('FIREBASE_CLIENT_CERT_URL', '')
+FIREBASE_CLIENT_CERT_URL = os.environ.get('FIREBASE_CLIENT_CERT_URL', 'https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40jpfinal-c9340.iam.gserviceaccount.com')
 
 # SSL/HTTPS settings for production
 if not DEBUG:

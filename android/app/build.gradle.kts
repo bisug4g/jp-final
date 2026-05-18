@@ -21,11 +21,9 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix = ".debug"
-            versionNameSuffix = "-debug"
             isDebuggable = true
-            // Debug APK uses staging URL so prod data isn't touched during testing
-            buildConfigField("String", "APP_URL", "\"https://jaytibirthday.in\"")
+            // No applicationIdSuffix — keeps com.jayti.companion matching google-services.json
+            buildConfigField("String", "APP_URL", "\"https://jpfinal-c9340.web.app\"")
             buildConfigField("String", "ENV", "\"debug\"")
         }
         release {
