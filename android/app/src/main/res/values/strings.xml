@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Jayti</string>
+    <string name="loading">Loading your space…</string>
+    <string name="offline_title">No internet</string>
+    <string name="offline_message">Check your connection and try again.</string>
+    <string name="retry">Retry</string>
+</resources>
