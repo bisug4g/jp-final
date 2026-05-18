@@ -8,7 +8,7 @@ const FIREBASE_FALLBACK = {
   projectId: "jpfinal-c9340",
   storageBucket: "jpfinal-c9340.firebasestorage.app",
   messagingSenderId: "588713240952",
-  appId: "1:588713240952:web:2b25d423858efc11fe008d"
+  appId: "1:588713240952:web:a6bfb6013e3eea6efe008d"
 };
 
 window.JaytiFirebase = { enabled: false, analyticsEnabled: false, config: null };
