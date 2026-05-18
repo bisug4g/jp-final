@@ -1,19 +1,9 @@
 {
   "theme": "Default",
-  "selectedAuthType": "oauth-personal",
-
-  "model": "gemini-2.5-pro",
-
-  "coreTools": [
-    "read_file",
-    "write_file",
-    "list_directory",
-    "run_shell_command",
-    "search_file_content",
-    "web_fetch",
-    "web_search"
-  ],
-
+  "autoAccept": false,
+  "telemetry": {
+    "enabled": false
+  },
   "mcpServers": {
     "github": {
       "command": "npx",
@@ -25,11 +15,7 @@
     },
     "filesystem": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-        "."
-      ],
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "."],
       "description": "Full filesystem access to the project root"
     },
     "fetch": {
@@ -37,21 +23,5 @@
       "args": ["-y", "@modelcontextprotocol/server-fetch"],
       "description": "HTTP fetch for reading docs, API responses"
     }
-  },
-
-  "contextFileName": "GEMINI.md",
-
-  "autoAccept": false,
-
-  "telemetry": {
-    "enabled": false
-  },
-
-  "checkpointing": {
-    "enabled": true
-  },
-
-  "tokenCache": {
-    "enabled": true
   }
 }

@@ -69,6 +69,8 @@ firebase-hosting/static/
 
 # Gemini CLI — commit settings.json and GEMINI.md, but not session history
 .gemini/tmp/
+.gemini/.env
+.gemini/checkpoints/
 .gemini/checkpoints/
 .gemini/*.log
 
