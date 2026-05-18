@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}90-Day Guidance - JaytiPargal.in{% endblock %}
+
+{% block content %}
+<div class="page-shell">
+    <div class="page-hero">
+        <div class="page-hero-copy">
+            <h1>Cosmic Guidance</h1>
+            <p>Short-term guidance based on your chart and the broader timing of the current period.</p>
+        </div>
+        <div class="page-actions">
+            <a href="{% url 'astro_dashboard' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Astro
+            </a>
+        </div>
+    </div>
+
+    {% if current_dasha %}
+    <div class="surface-note mb-4">
+        <strong>Current period:</strong> {{ current_dasha.lord }} Mahadasha.
+    </div>
+    {% endif %}
+
+    <div class="shell-grid">
+        {% for prediction in predictions %}
+        <div class="shell-card">
+            <div class="shell-card-header">
+                <div class="section-heading mb-0">
+                    <div>
+                        <h4>{{ prediction.focus }}</h4>
+                        <p class="section-subtitle">{{ prediction.dates }}</p>
+                    </div>
+                    <span class="chip {% if prediction.intensity == 'favorable' %}chip-success{% elif prediction.intensity == 'challenging' %}chip-warning{% else %}chip-soft{% endif %}">
+                        {{ prediction.intensity|title }}
+                    </span>
+                </div>
+            </div>
+            <div class="shell-card-body">
+                <p class="prose-surface mb-3">{{ prediction.description }}</p>
+                <div class="surface-note">
+                    <strong>Recommendation:</strong> {{ prediction.recommendation }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="surface-note mt-4">
+        <strong>How to use this:</strong> treat astrology here as timing guidance and reflection support, not a fixed script for your choices.
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Folder - jayti{% endblock %}
+
+{% block content %}
+<div class="page-shell" style="max-width: 760px;">
+    <div class="shell-danger shell-card">
+        <div class="shell-card-header">
+            <div class="section-heading mb-0">
+                <h3>Delete Folder</h3>
+            </div>
+        </div>
+        <div class="shell-card-body text-center">
+            <div class="icon-circle mx-auto mb-3"><i class="fas fa-folder-minus"></i></div>
+            <h4 class="mb-3">Delete “{{ folder.name }}”?</h4>
+            <p class="text-muted">Notes inside this folder will be kept, but they will no longer belong to any folder.</p>
+
+            <form method="post" class="mt-4">
+                {% csrf_token %}
+                <div class="shell-actions justify-content-center">
+                    <a href="{% url 'note_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-danger">Delete Folder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

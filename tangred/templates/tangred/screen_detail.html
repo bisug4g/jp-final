@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ screen.title|default:"Tan Studio Screen" }}{% endblock %}
+
+{% block content %}
+<div class="page-shell page-shell-wide">
+    <div class="page-breadcrumbs">
+        <a href="{% url 'tan_studio_home' %}">Tan Studio</a>
+        <span>/</span>
+        <a href="{% url 'tan_studio_project_detail' project.pk %}">{{ project.title|truncatechars:32 }}</a>
+        <span>/</span>
+        <span class="current">{{ screen.title|default:"Screen" }}</span>
+    </div>
+
+    <div class="page-hero">
+        <div class="page-hero-copy">
+            <h1>{{ screen.title|default:"Generated Screen" }}</h1>
+            <p>{{ screen.summary|default:"This screen was generated through Stitch MCP and stored locally in Tan Studio." }}</p>
+        </div>
+        <div class="page-actions">
+            <form method="post" action="{% url 'tan_studio_refresh_screen' screen.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-secondary">
+                    <i class="fas fa-rotate me-2"></i>Refresh
+                </button>
+            </form>
+            {% if screen.html_url %}
+            <a href="{{ screen.html_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Open HTML</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="shell-sidebar-layout">
+        <div class="shell-grid">
+            <div class="shell-card">
+                <div class="shell-card-header">
+                    <div class="section-heading mb-0"><h4>Preview</h4></div>
+                </div>
+                <div class="shell-card-body">
+                    {% if screen.screenshot_url %}
+                    <img src="{{ screen.screenshot_url }}" alt="{{ screen.title }}" style="width:100%; border-radius:20px; display:block;">
+                    {% else %}
+                    <div class="empty-shell">
+                        <h4>No screenshot returned</h4>
+                        <p class="text-muted">The Stitch response did not include a preview image for this screen.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if screen.html_url %}
+            <div class="shell-card">
+                <div class="shell-card-header">
+                    <div class="section-heading mb-0"><h4>Live HTML Preview</h4></div>
+                </div>
+                <div class="shell-card-body">
+                    <iframe src="{{ screen.html_url }}" title="{{ screen.title }}" style="width:100%; min-height:760px; border:0; border-radius:18px; background:#fff;"></iframe>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="shell-grid">
+            <div class="shell-panel">
+                <div class="section-heading mb-2"><h5>Generation Details</h5></div>
+                <div class="meta-list">
+                    <div class="meta-row">
+                        <div class="meta-label">Status</div>
+                        <div class="meta-value">{{ screen.status }}</div>
+                    </div>
+                    <div class="meta-row">
+                        <div class="meta-label">Device</div>
+                        <div class="meta-value">{{ screen.get_device_type_display }}</div>
+                    </div>
+                    <div class="meta-row">
+                        <div class="meta-label">Model</div>
+                        <div class="meta-value">{{ screen.get_model_id_display }}</div>
+                    </div>
+                    <div class="meta-row">
+                        <div class="meta-label">Prompt AI</div>
+                        <div class="meta-value">{{ screen.prompt_optimizer_provider|default:"-" }}</div>
+                    </div>
+                    <div class="meta-row">
+                        <div class="meta-label">Prompt Model</div>
+                        <div class="meta-value">{{ screen.prompt_optimizer_model|default:"-" }}</div>
+                    </div>
+                    <div class="meta-row">
+                        <div class="meta-label">Session</div>
+                        <div class="meta-value">{{ screen.stitch_session_id|default:"-" }}</div>
+                    </div>
+                    <div class="meta-row">
+                        <div class="meta-label">Screen ID</div>
+                        <div class="meta-value">{{ screen.stitch_screen_id|default:"-" }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="shell-card">
+                <div class="shell-card-header">
+                    <div class="section-heading mb-0"><h4>Original Prompt</h4></div>
+                </div>
+                <div class="shell-card-body">
+                    <div class="prose-surface" style="white-space: pre-wrap;">{{ screen.prompt }}</div>
+                </div>
+            </div>
+
+            {% if screen.optimized_prompt %}
+            <div class="shell-card">
+                <div class="shell-card-header">
+                    <div class="section-heading mb-0"><h4>Optimized Prompt</h4></div>
+                </div>
+                <div class="shell-card-body">
+                    <div class="prose-surface" style="white-space: pre-wrap;">{{ screen.optimized_prompt }}</div>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if screen.suggestions %}
+            <div class="shell-card">
+                <div class="shell-card-header">
+                    <div class="section-heading mb-0"><h4>Suggested Next Steps</h4></div>
+                </div>
+                <div class="shell-card-body">
+                    <div class="list-stack">
+                        {% for suggestion in screen.suggestions %}
+                        <div class="surface-note">{{ suggestion }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

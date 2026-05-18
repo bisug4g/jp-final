@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ project.title }} - Tan Studio{% endblock %}
+
+{% block content %}
+<div class="page-shell page-shell-wide">
+    <div class="page-breadcrumbs">
+        <a href="{% url 'tan_studio_home' %}">Tan Studio</a>
+        <span>/</span>
+        <span class="current">{{ project.title|truncatechars:42 }}</span>
+    </div>
+
+    <div class="page-hero">
+        <div class="page-hero-copy">
+            <h1>{{ project.title }}</h1>
+            <p>{{ project.description|default:"A Stitch-connected design workspace for prompt-based screen generation." }}</p>
+        </div>
+        <div class="page-actions">
+            <span class="chip">Stitch {{ project.stitch_project_id }}</span>
+        </div>
+    </div>
+
+    <div class="shell-sidebar-layout">
+        <div class="shell-grid">
+            <div class="shell-card">
+                <div class="shell-card-header">
+                    <div class="section-heading mb-0">
+                        <h4>Generated Screens</h4>
+                        <span class="chip">{{ screens|length }} saved</span>
+                    </div>
+                </div>
+                <div class="shell-card-body">
+                    {% if screens %}
+                    <div class="list-stack">
+                        {% for screen in screens %}
+                        <div class="list-row" style="align-items: flex-start;">
+                            <div>
+                                <a href="{% url 'tan_studio_screen_detail' screen.pk %}">{{ screen.title|default:"Untitled Screen" }}</a>
+                                <div class="text-muted small mt-1">{{ screen.created_at|date:"M d, Y H:i" }} · {{ screen.device_type }} · {{ screen.model_id }}</div>
+                                {% if screen.prompt_optimizer_model %}
+                                <div class="text-muted small mt-1">Optimized with {{ screen.prompt_optimizer_model }}</div>
+                                {% endif %}
+                                <div class="text-muted small mt-1">{{ screen.prompt|truncatechars:120 }}</div>
+                            </div>
+                            <div class="chip-row">
+                                <span class="chip chip-soft">{{ screen.status }}</span>
+                                <a href="{% url 'tan_studio_screen_detail' screen.pk %}" class="btn btn-sm btn-outline-secondary">View</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-shell">
+                        <h4>No screens yet</h4>
+                        <p class="text-muted">Use the generation form to create the first screen for this project.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="shell-grid">
+            <div class="shell-card">
+                <div class="shell-card-header">
+                    <div class="section-heading mb-0"><h4>Generate Screen</h4></div>
+                </div>
+                <div class="shell-card-body">
+                    <form method="post" action="{% url 'tan_studio_generate_screen' project.pk %}" class="shell-form">
+                        {% csrf_token %}
+                        <div>
+                            <label class="form-label">Prompt</label>
+                            <textarea name="prompt" class="form-control" rows="6" placeholder="Describe the screen you want Stitch to design." required></textarea>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Device Type</label>
+                                <select name="device_type" class="form-select">
+                                    {% for value, label in device_choices %}
+                                    <option value="{{ value }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Model</label>
+                                <select name="model_id" class="form-select">
+                                    {% for value, label in model_choices %}
+                                    <option value="{{ value }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="shell-actions">
+                            <button type="submit" class="btn btn-primary" {% if not stitch_ready or not prompt_ai_ready %}disabled{% endif %}>
+                                <i class="fas fa-sparkles me-2"></i>Generate with Stitch
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="surface-note">
+                <strong>Prompting tip:</strong> mention product type, device, tone, layout intent, trust cues, and any brand color or typography direction you want woven into the design brief.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

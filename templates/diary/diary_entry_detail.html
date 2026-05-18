@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Diary Entry - {{ entry.entry_date|date:"F d, Y" }}{% endblock %}
+
+{% block content %}
+<div class="page-shell">
+    <div class="page-breadcrumbs">
+        <a href="{% url 'diary_overview' %}">Diary</a>
+        <span>/</span>
+        <span class="current">{{ entry.entry_date|date:"M d, Y" }}</span>
+    </div>
+
+    <div class="page-hero">
+        <div class="page-hero-copy">
+            <h1>{{ entry.entry_date|date:"l, F d, Y" }}</h1>
+            <p>Return to a past reflection, its mood, and the method you used to capture it.</p>
+        </div>
+        <div class="page-actions">
+            {% if is_editable %}
+            <a href="{% url 'diary_write_date' entry.entry_date|date:'Y-m-d' %}" class="btn btn-primary">
+                <i class="fas fa-pen-to-square me-2"></i>Edit Entry
+            </a>
+            {% endif %}
+            <a href="{% url 'diary_calendar' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-calendar me-2"></i>Calendar
+            </a>
+        </div>
+    </div>
+
+    <div class="shell-sidebar-layout">
+        <div class="shell-card">
+            <div class="shell-card-body">
+                {% if entry.prompt_used %}
+                <div class="surface-note mb-4">
+                    <strong>Prompt used:</strong> {{ entry.prompt_used }}
+                </div>
+                {% endif %}
+
+                {% if entry.content %}
+                <div class="prose-surface" style="white-space: pre-wrap;">{{ entry.content }}</div>
+                {% endif %}
+
+                {% if entry.voice_transcript %}
+                <div class="surface-note mt-4">
+                    <strong>Voice Transcript:</strong><br>
+                    <span style="white-space: pre-wrap;">{{ entry.voice_transcript }}</span>
+                    {% if entry.voice_duration %}<div class="small text-muted mt-2">Duration {{ entry.voice_duration }} seconds</div>{% endif %}
+                </div>
+                {% endif %}
+
+                {% if entry.handwriting_ocr_text %}
+                <div class="surface-note mt-4">
+                    <strong>Handwriting OCR:</strong><br>
+                    <span style="white-space: pre-wrap;">{{ entry.handwriting_ocr_text }}</span>
+                </div>
+                {% endif %}
+
+                {% if entry.mood_note %}
+                <div class="surface-note mt-4">
+                    <strong>Mood Note:</strong> {{ entry.mood_note }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="shell-grid">
+            <div class="shell-panel">
+                <div class="section-heading mb-2"><h5>Entry Details</h5></div>
+                <div class="meta-list">
+                    <div class="meta-row">
+                        <div class="meta-label">Method</div>
+                        <div class="meta-value">{{ entry.get_input_method_display }}</div>
+                    </div>
+                    <div class="meta-row">
+                        <div class="meta-label">Mood</div>
+                        <div class="meta-value">{% if entry.mood %}{{ entry.get_mood_display }}{% else %}Not tracked{% endif %}</div>
+                    </div>
+                    <div class="meta-row">
+                        <div class="meta-label">Editable</div>
+                        <div class="meta-value">{% if is_editable %}Today only{% else %}Read only{% endif %}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="surface-note">
+                <strong>Diary rule:</strong> past entries remain read-only, so each page becomes a clean snapshot of how that day truly felt.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jayti – Loading…</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      min-height:100vh;
+      display:flex;align-items:center;justify-content:center;flex-direction:column;
+      background:linear-gradient(135deg,#fff5f7 0%,#fce4ec 100%);
+      font-family:'Georgia',serif;
+      color:#c2185b;
+    }
+    .heart{font-size:3rem;animation:pulse 1.2s ease-in-out infinite}
+    @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.2);opacity:.7}}
+    p{margin-top:1.2rem;font-size:1rem;opacity:.7;letter-spacing:.04em}
+  </style>
+</head>
+<body>
+  <div class="heart">💝</div>
+  <p>Opening your space…</p>
+  <!-- This page is only shown during Cloud Run cold start (<2 s normally). -->
+</body>
+</html>

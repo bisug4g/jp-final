@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if note %}Edit{% else %}Create{% endif %} Note - jayti{% endblock %}
+
+{% block content %}
+<div class="page-shell">
+    <div class="page-breadcrumbs">
+        <a href="{% url 'note_list' %}">Notes</a>
+        <span>/</span>
+        <span class="current">{% if note %}Edit{% else %}New{% endif %} Note</span>
+    </div>
+
+    <div class="page-hero">
+        <div class="page-hero-copy">
+            <h1>{% if note %}Edit Note{% else %}New Note{% endif %}</h1>
+            <p>Capture a thought cleanly, organize it with tags, and drop it into the right folder.</p>
+        </div>
+    </div>
+
+    <div class="shell-card">
+        <div class="shell-card-body">
+            <form method="post" class="shell-form">
+                {% csrf_token %}
+
+                <div>
+                    <label class="form-label">Title</label>
+                    <input type="text" name="title" class="form-control" value="{{ note.title|default:'' }}" placeholder="Give your note a clear title">
+                </div>
+
+                <div>
+                    <label class="form-label">Content</label>
+                    <textarea name="content" class="form-control" rows="14" placeholder="Write your thoughts here...">{{ note.content|default:'' }}</textarea>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-7">
+                        <label class="form-label">Tags</label>
+                        <input type="text" name="tags" class="form-control" value="{{ tags|default:'' }}" placeholder="personal, work, ideas">
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label">Folder</label>
+                        <select name="folder" class="form-select">
+                            <option value="">No folder</option>
+                            {% for folder in folders %}
+                            <option value="{{ folder.id }}" {% if note.folder.id == folder.id %}selected{% endif %}>{{ folder.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="shell-actions">
+                    <a href="{% url 'note_list' %}" class="btn btn-outline-secondary">Back</a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>{% if note %}Update{% else %}Save{% endif %} Note
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,849 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+/* ========================================
+   DASHBOARD - PINK/CORAL ANALYTICS THEME
+   Based on Reference Image Color Palette
+======================================== */
+
+/* Dashboard Container */
+.dashboard-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+/* Welcome Header */
+.welcome-header {
+  margin-bottom: 2rem;
+}
+
+.welcome-header h1 {
+  font-family: 'Lora', serif;
+  font-weight: 600;
+  font-size: 1.75rem;
+  color: #333333;
+  margin: 0;
+}
+
+/* Activity Tracker Section - Pink Gradient with Black Text */
+.activity-section {
+  background: linear-gradient(135deg, #FB6F92 0%, #FF8FAB 100%);
+  border-radius: 20px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  color: #1a1a1a;
+  box-shadow: 0 10px 40px rgba(251, 111, 146, 0.35);
+}
+
+.activity-section h3 {
+  font-family: 'Lora', serif;
+  font-weight: 700;
+  color: #1a1a1a;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.activity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.activity-stats {
+  display: flex;
+  gap: 1rem;
+  font-family: 'Lora', serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.stat-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255,255,255,0.4);
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  border: 1px solid rgba(255,255,255,0.4);
+  color: #1a1a1a;
+}
+
+.activity-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 1rem;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Lora', serif;
+  font-weight: 600;
+  font-size: 0.75rem;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.calendar-day:hover {
+  transform: scale(1.1);
+  z-index: 10;
+}
+
+.calendar-day.no-activity { background: rgba(255,255,255,0.2); color: #666666; }
+.calendar-day.low-activity { background: rgba(255,255,255,0.45); color: #333333; }
+.calendar-day.medium-activity { background: rgba(255,255,255,0.7); color: #1a1a1a; font-weight: 700; }
+.calendar-day.high-activity { background: white; color: #1a1a1a; font-weight: 700; }
+.calendar-day.today { box-shadow: 0 0 0 2px #1a1a1a; }
+
+.calendar-day-tooltip {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a1a;
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  z-index: 100;
+  margin-bottom: 6px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+.calendar-day:hover .calendar-day-tooltip { display: block; }
+
+.calendar-legend {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  font-family: 'Lora', serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: #333333;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+}
+
+.legend-dot.none { background: rgba(255,255,255,0.15); }
+.legend-dot.low { background: rgba(255,255,255,0.35); }
+.legend-dot.med { background: rgba(255,255,255,0.6); }
+.legend-dot.high { background: white; }
+
+/* ========================================
+   TANGRED LOCKED CARD - Red/Black Gradient
+======================================== */
+.tangred-card {
+  background: linear-gradient(135deg, #8B0000 0%, #DC143C 50%, #000000 100%) !important;
+  color: white !important;
+  cursor: pointer;
+  position: relative;
+  overflow: visible;
+}
+
+.tangred-card:hover {
+  background: linear-gradient(135deg, #A00000 0%, #FF1744 50%, #1a1a1a 100%) !important;
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(220, 20, 60, 0.5);
+}
+
+.tangred-card .card-title {
+  color: white !important;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.tangred-card .card-desc {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.tangred-card .card-icon {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+}
+
+.locked-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 0.3rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* ========================================
+   COMING SOON MODAL
+======================================== */
+.coming-soon-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.coming-soon-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+}
+
+.coming-soon-content {
+  position: relative;
+  background: linear-gradient(135deg, #8B0000 0%, #DC143C 50%, #000000 100%);
+  border-radius: 24px;
+  padding: 3rem 2.5rem;
+  max-width: 450px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  animation: slideUp 0.4s ease;
+}
+
+.coming-soon-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.5rem;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  color: white;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+.coming-soon-content h2 {
+  color: white;
+  font-family: 'Lora', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.coming-soon-content p {
+  color: rgba(255, 255, 255, 0.95);
+  font-family: 'Lora', serif;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.coming-soon-subtitle {
+  color: rgba(255, 255, 255, 0.75) !important;
+  font-size: 0.95rem !important;
+  margin-bottom: 2rem !important;
+}
+
+.coming-soon-btn {
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 0.75rem 2rem;
+  border-radius: 25px;
+  font-family: 'Lora', serif;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.coming-soon-btn:hover {
+  background: rgba(0, 0, 0, 0.8);
+  border-color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+   MAIN GRID - Pink/Coral Cards
+======================================== */
+.main-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+/* Enterprise Card - Pink Gradient with Black Text */
+.enterprise-card {
+  aspect-ratio: 1 / 1;
+  border-radius: 20px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  text-decoration: none;
+  background: linear-gradient(145deg, #FB6F92, #FF8FAB);
+  color: #1a1a1a;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 30px rgba(251, 111, 146, 0.3);
+  border: 1px solid rgba(255,255,255,0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.enterprise-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+}
+
+.enterprise-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(251, 111, 146, 0.4);
+  color: #1a1a1a;
+  background: linear-gradient(145deg, #FF8FAB, #FFB3C6);
+}
+
+/* Card Icon */
+.card-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #1a1a1a;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+/* Card Content - Black Bold Text */
+.card-value {
+  font-family: 'Lora', serif;
+  font-weight: 700;
+  font-size: 2.5rem;
+  line-height: 1;
+  margin-bottom: 0.4rem;
+  color: #1a1a1a;
+}
+
+.card-label {
+  font-family: 'Lora', serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #333333;
+}
+
+.card-title {
+  font-family: 'Lora', serif;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: #1a1a1a;
+}
+
+.card-desc {
+  font-family: 'Lora', serif;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: #333333;
+  line-height: 1.4;
+}
+
+/* Chart Cards - Span 2 columns */
+.chart-card {
+  grid-column: span 2;
+  aspect-ratio: auto;
+  min-height: 280px;
+}
+
+.chart-wrapper {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+/* ========================================
+   MOBILE RESPONSIVE
+======================================== */
+@media (max-width: 1024px) {
+  .main-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .chart-card {
+    grid-column: span 3;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1rem;
+  }
+  
+  .main-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  .chart-card {
+    grid-column: span 2;
+    min-height: 220px;
+  }
+  
+  .enterprise-card {
+    padding: 1rem;
+    border-radius: 16px;
+  }
+  
+  .card-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 1.2rem;
+  }
+  
+  .card-value {
+    font-size: 2rem;
+  }
+  
+  .card-label {
+    font-size: 0.7rem;
+  }
+  
+  .activity-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .activity-stats {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .welcome-header h1 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .calendar-day {
+    font-size: 0.65rem;
+  }
+  
+  .card-value {
+    font-size: 1.75rem;
+  }
+  
+  .card-icon {
+    width: 42px;
+    height: 42px;
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  
+  <!-- Welcome Header -->
+  <div class="welcome-header">
+    <h1>Welcome back, {{ display_name }}!</h1>
+  </div>
+  
+  <!-- Activity Tracker Section -->
+  <div class="activity-section" id="activity-tracker">
+    <div class="activity-header">
+      <h3><i class="fas fa-fire me-2"></i>Your Journey Since Feb 6</h3>
+      <div class="activity-stats">
+        <span class="stat-badge"><i class="fas fa-fire"></i> <span id="streak-count">0</span> streak</span>
+        <span class="stat-badge"><i class="fas fa-check-circle"></i> <span id="active-days">0</span> active</span>
+        <span class="stat-badge"><i class="fas fa-times-circle"></i> <span id="inactive-days">0</span> missed</span>
+      </div>
+    </div>
+    <div class="activity-calendar" id="activity-calendar"></div>
+    <div class="calendar-legend">
+      <div class="legend-item"><div class="legend-dot none"></div> None</div>
+      <div class="legend-item"><div class="legend-dot low"></div> Light</div>
+      <div class="legend-item"><div class="legend-dot med"></div> Good</div>
+      <div class="legend-item"><div class="legend-dot high"></div> Great</div>
+    </div>
+  </div>
+  
+  <!-- Main Grid - All Cards -->
+  <div class="main-grid">
+    
+    <!-- Row 1 -->
+    {% if birthday_countdown %}
+    <div class="enterprise-card">
+      <div class="card-icon"><i class="fas fa-birthday-cake"></i></div>
+      {% if birthday_countdown.is_today %}
+        <div class="card-value">🎉</div>
+        <div class="card-label">Happy Birthday!</div>
+      {% else %}
+        <div class="card-value">{{ birthday_countdown.days_until }}</div>
+        <div class="card-label">Days to Birthday</div>
+      {% endif %}
+    </div>
+    {% endif %}
+    
+    <div class="enterprise-card" id="briefing-box">
+      <div class="card-icon"><i class="fas fa-sun"></i></div>
+      <div class="card-title">Daily Briefing</div>
+      <div class="card-desc" id="briefing-content">Your insights await</div>
+    </div>
+    
+    <div class="enterprise-card" id="astro-box">
+      <div class="card-icon"><i class="fas fa-star"></i></div>
+      <div class="card-title">Cosmic Insight</div>
+      <div class="card-desc" id="astro-content">Cosmic guidance</div>
+    </div>
+    
+    <div class="enterprise-card">
+      <div class="card-icon"><i class="fas fa-sticky-note"></i></div>
+      <div class="card-value">{{ recent_notes }}</div>
+      <div class="card-label">Notes</div>
+    </div>
+    
+    <!-- Row 2 -->
+    <div class="enterprise-card">
+      <div class="card-icon"><i class="fas fa-book"></i></div>
+      <div class="card-value">{{ recent_diary }}</div>
+      <div class="card-label">Diary Entries</div>
+    </div>
+    
+    <div class="enterprise-card">
+      <div class="card-icon"><i class="fas fa-bullseye"></i></div>
+      <div class="card-value">{{ active_goals }}</div>
+      <div class="card-label">Active Goals</div>
+    </div>
+    
+    <div class="enterprise-card">
+      <div class="card-icon"><i class="fas fa-tasks"></i></div>
+      <div class="card-value">{{ pending_tasks }}</div>
+      <div class="card-label">Pending Tasks</div>
+    </div>
+    
+    <a href="{% url 'ai_chat' %}" class="enterprise-card">
+      <div class="card-icon"><i class="fas fa-robot"></i></div>
+      <div class="card-title">Ask Jayti</div>
+      <div class="card-desc">Your AI companion</div>
+    </a>
+    
+    <!-- Row 3: Charts -->
+    <div class="enterprise-card chart-card">
+      <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+      <div class="card-title">Mood Trends</div>
+      <div class="chart-wrapper">
+        <canvas id="moodChart"></canvas>
+      </div>
+    </div>
+    
+    <div class="enterprise-card chart-card">
+      <div class="card-icon"><i class="fas fa-chart-pie"></i></div>
+      <div class="card-title">Goal Progress</div>
+      <div class="chart-wrapper">
+        <canvas id="goalChart"></canvas>
+      </div>
+    </div>
+    
+    <!-- Row 4: Quick Actions -->
+    <a href="{% url 'diary_write' %}" class="enterprise-card">
+      <div class="card-icon"><i class="fas fa-pen"></i></div>
+      <div class="card-title">Write Diary</div>
+      <div class="card-desc">Capture your day</div>
+    </a>
+    
+    <a href="{% url 'note_create' %}" class="enterprise-card">
+      <div class="card-icon"><i class="fas fa-plus"></i></div>
+      <div class="card-title">New Note</div>
+      <div class="card-desc">Quick thoughts</div>
+    </a>
+    
+    <a href="{% url 'goal_list' %}" class="enterprise-card">
+      <div class="card-icon"><i class="fas fa-flag"></i></div>
+      <div class="card-title">View Goals</div>
+      <div class="card-desc">Track progress</div>
+    </a>
+    
+    <a href="{% url 'astro_dashboard' %}" class="enterprise-card">
+      <div class="card-icon"><i class="fas fa-moon"></i></div>
+      <div class="card-title">Astro</div>
+      <div class="card-desc">Cosmic guidance</div>
+    </a>
+    
+    <a href="{% url 'session_dashboard' %}" class="enterprise-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+      <div class="card-icon"><i class="fas fa-shield-alt"></i></div>
+      <div class="card-title">Security</div>
+      <div class="card-desc">Session & IP tracking</div>
+    </a>
+
+    <a href="{% url 'tangred_home' %}" class="enterprise-card tangred-card" id="tangred-card">
+      <div class="card-icon" style="background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.2);">
+        <i class="fas fa-wand-magic-sparkles"></i>
+      </div>
+      <div class="card-title">Tangred</div>
+      <div class="card-desc">Agentic wardrobe AI with Tan Studio inside</div>
+      <div class="locked-badge"><i class="fas fa-bolt"></i> Live</div>
+    </a>
+
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
+// Render calendar immediately with placeholder data while loading
+function renderCalendarPlaceholder() {
+  const el = document.getElementById('activity-calendar');
+  let html = '';
+  const days = ['M','T','W','T','F','S','S'];
+  
+  days.forEach(d => {
+    html += `<div style="text-align:center;font-size:0.65rem;color:rgba(255,255,255,0.5);padding:4px;font-family:'Lora',serif;font-weight:600;">${d}</div>`;
+  });
+  
+  // Show Feb 6 to today placeholder
+  const startDate = new Date(2026, 1, 6); // Feb 6, 2026
+  const today = new Date();
+  const startDay = startDate.getDay() === 0 ? 6 : startDate.getDay() - 1; // Monday = 0
+  
+  for (let i = 0; i < startDay; i++) {
+    html += '<div></div>';
+  }
+  
+  let currentDate = new Date(startDate);
+  while (currentDate <= today) {
+    const day = currentDate.getDate();
+    const isToday = currentDate.toDateString() === today.toDateString();
+    html += `<div class="calendar-day no-activity${isToday ? ' today' : ''}">${day}</div>`;
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+  
+  el.innerHTML = html;
+}
+
+// Show placeholder immediately
+renderCalendarPlaceholder();
+
+// Load actual data in background
+fetch('/api/activity-calendar/')
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      document.getElementById('streak-count').textContent = data.stats.current_streak;
+      document.getElementById('active-days').textContent = data.stats.active_days;
+      document.getElementById('inactive-days').textContent = data.stats.inactive_days;
+      renderCalendar(data.calendar);
+    }
+  })
+  .catch(() => {});
+
+function renderCalendar(calendar) {
+  const el = document.getElementById('activity-calendar');
+  let html = '';
+  const today = new Date().toISOString().split('T')[0];
+  
+  ['M','T','W','T','F','S','S'].forEach(d => {
+    html += `<div style="text-align:center;font-size:0.65rem;color:rgba(255,255,255,0.5);padding:4px;font-family:'Lora',serif;font-weight:600;">${d}</div>`;
+  });
+  
+  if (calendar.length > 0) {
+    for (let i = 0; i < calendar[0].weekday; i++) {
+      html += '<div></div>';
+    }
+  }
+  
+  calendar.forEach(day => {
+    let cls = 'no-activity';
+    if (day.activity_score >= 50) cls = 'high-activity';
+    else if (day.activity_score >= 25) cls = 'medium-activity';
+    else if (day.activity_score > 0) cls = 'low-activity';
+    
+    const isToday = day.date === today ? ' today' : '';
+    const d = day.details;
+    let tip = day.date + '<br>';
+    if (day.has_activity) {
+      const p = [];
+      if (d.diary > 0) p.push('📖 ' + d.diary);
+      if (d.notes > 0) p.push('📝 ' + d.notes);
+      if (d.goals > 0) p.push('🎯 ' + d.goals);
+      if (d.tasks > 0) p.push('✅ ' + d.tasks);
+      tip += p.join(' ') || 'Active';
+    } else {
+      tip += 'No activity';
+    }
+    
+    html += `<div class="calendar-day ${cls}${isToday}">${day.day}<div class="calendar-day-tooltip">${tip}</div></div>`;
+  });
+  
+  el.innerHTML = html;
+}
+
+// Load other data without blocking
+fetch('/api/daily-briefing/')
+  .then(r => r.json())
+  .then(data => {
+    const briefingEl = document.getElementById('briefing-content');
+    if (data.success && data.briefing) {
+      briefingEl.innerHTML = data.briefing.substring(0, 60) + '...';
+    } else if (data.error) {
+      briefingEl.textContent = 'AI briefing unavailable';
+    }
+  })
+  .catch(() => {});
+
+fetch('/api/daily-astro/')
+  .then(r => r.json())
+  .then(data => {
+    if (data.success && data.insight.has_chart) document.getElementById('astro-content').innerHTML = data.insight.insight.substring(0, 50) + '...';
+  })
+  .catch(() => {});
+
+// Charts - Pink Theme
+fetch('/api/mood-trends/?period=month')
+  .then(r => r.json())
+  .then(data => {
+    if (data.success && data.chart_data.labels.length > 0) {
+      new Chart(document.getElementById('moodChart'), {
+        type: 'line',
+        data: {
+          labels: data.chart_data.labels,
+          datasets: [{
+            data: data.chart_data.data,
+            borderColor: 'white',
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { 
+            y: { 
+              beginAtZero: true, 
+              max: 5,
+              ticks: { color: 'rgba(255,255,255,0.7)' },
+              grid: { color: 'rgba(255,255,255,0.15)' }
+            }, 
+            x: { display: false } 
+          }
+        }
+      });
+    }
+  });
+
+fetch('/api/goal-progress/')
+  .then(r => r.json())
+  .then(data => {
+    if (data.success && data.charts.goals.labels.length > 0) {
+      new Chart(document.getElementById('goalChart'), {
+        type: 'doughnut',
+        data: {
+          labels: data.charts.goals.labels,
+          datasets: [{ 
+            data: data.charts.goals.data, 
+            backgroundColor: ['#FFE5EC','#FFC2D1','#FFB3C6','#FF8FAB'],
+            borderColor: '#FB6F92',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { 
+            legend: { 
+              position: 'bottom', 
+              labels: { 
+                boxWidth: 12, 
+                padding: 15,
+                color: 'white',
+                font: { family: 'Lora', weight: '600' }
+              } 
+            } 
+          }
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}

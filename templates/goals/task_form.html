@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Task - {{ goal.title }}{% endblock %}
+
+{% block content %}
+<div class="page-shell" style="max-width: 900px;">
+    <div class="page-breadcrumbs">
+        <a href="{% url 'goal_list' %}">Goals</a>
+        <span>/</span>
+        <a href="{% url 'goal_detail' goal.pk %}">{{ goal.title|truncatechars:28 }}</a>
+        <span>/</span>
+        <span class="current">Add Task</span>
+    </div>
+
+    <div class="shell-card">
+        <div class="shell-card-header">
+            <div class="section-heading mb-0">
+                <div>
+                    <h4>Add New Task</h4>
+                    <p class="section-subtitle">Goal: {{ goal.title }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="shell-card-body">
+            <form method="post" class="shell-form">
+                {% csrf_token %}
+                <div>
+                    <label class="form-label">Task Title</label>
+                    <input type="text" class="form-control" name="title" placeholder="Complete market research report" required>
+                </div>
+                <div>
+                    <label class="form-label">Description</label>
+                    <textarea class="form-control" name="description" rows="4" placeholder="Task details..."></textarea>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Department</label>
+                        <select class="form-select" name="department" required>
+                            <option value="strategy">Strategy</option>
+                            <option value="finance">Finance</option>
+                            <option value="hr">HR</option>
+                            <option value="operations">Operations</option>
+                            <option value="sales">Sales</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Due Date</label>
+                        <input type="date" class="form-control" name="due_date" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label">Task Frequency</label>
+                    <div class="chip-row">
+                        <label class="chip"><input class="form-check-input me-2" type="checkbox" name="is_daily">Daily</label>
+                        <label class="chip"><input class="form-check-input me-2" type="checkbox" name="is_weekly">Weekly</label>
+                        <label class="chip"><input class="form-check-input me-2" type="checkbox" name="is_monthly">Monthly</label>
+                        <label class="chip"><input class="form-check-input me-2" type="checkbox" name="is_quarterly">Quarterly</label>
+                    </div>
+                </div>
+                <div class="shell-actions">
+                    <a href="{% url 'goal_detail' goal.pk %}" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Add Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

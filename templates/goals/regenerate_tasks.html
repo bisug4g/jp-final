@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Regenerate AI Tasks - JaytiPargal.in{% endblock %}
+
+{% block content %}
+<div class="page-shell" style="max-width: 760px;">
+    <div class="shell-card">
+        <div class="shell-card-header">
+            <div class="section-heading mb-0"><h3>Regenerate AI Tasks</h3></div>
+        </div>
+        <div class="shell-card-body text-center">
+            <div class="icon-circle mx-auto mb-3"><i class="fas fa-wand-magic-sparkles"></i></div>
+            <h4 class="mb-3">Refresh the plan for “{{ goal.title }}”?</h4>
+            <div class="surface-note text-start">
+                <strong>Warning:</strong> all existing tasks for this goal will be removed and replaced with a newly generated set.
+            </div>
+            <form method="post" class="mt-4">
+                {% csrf_token %}
+                <div class="shell-actions justify-content-center">
+                    <a href="{% url 'goal_detail' goal.pk %}" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Regenerate Tasks</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

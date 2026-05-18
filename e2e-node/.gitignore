@@ -1,0 +1,7 @@
+node_modules/
+test-results/
+playwright-report/
+
+# Keep visual regression baselines checked in.
+!tests/__screenshots__/
+!tests/__screenshots__/**

@@ -1,0 +1,57 @@
+{% comment %}Task list partial for goal detail page{% endcomment %}
+{% if tasks %}
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Task</th>
+                <th>Dept</th>
+                <th>Due</th>
+                <th>Status</th>
+                <th>Progress</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+            <tr class="{% if task.status == 'done' %}table-success{% elif task.status == 'blocked' %}table-danger{% elif task.status == 'at_risk' %}table-warning{% endif %}">
+                <td>
+                    <strong>{{ task.title }}</strong>
+                    {% if task.description %}
+                    <br><small class="text-muted">{{ task.description|truncatechars:60 }}</small>
+                    {% endif %}
+                </td>
+                <td><span class="badge bg-light text-dark">{{ task.get_department_display }}</span></td>
+                <td>{{ task.due_date|date:"M d" }}</td>
+                <td>
+                    <span class="badge 
+                        {% if task.status == 'done' %}bg-success
+                        {% elif task.status == 'in_progress' %}bg-primary
+                        {% elif task.status == 'blocked' %}bg-danger
+                        {% elif task.status == 'at_risk' %}bg-warning text-dark
+                        {% elif task.status == 'overdue' %}bg-danger
+                        {% else %}bg-secondary{% endif %}">
+                        {{ task.get_status_display }}
+                    </span>
+                </td>
+                <td>
+                    <div class="progress" style="height: 6px; width: 60px;">
+                        <div class="progress-bar" style="width: {{ task.completion_percentage }}%"></div>
+                    </div>
+                </td>
+                <td>
+                    <a href="{% url 'task_update' task.pk %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'task_delete' task.pk %}" class="btn btn-sm btn-outline-danger">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p class="text-muted text-center py-4">No tasks in this category.</p>
+{% endif %}

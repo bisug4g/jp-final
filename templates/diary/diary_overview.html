@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+
+{% block title %}My Diary - JaytiPargal.in{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Diary Page - Pink/Coral Analytics Theme */
+.page-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.page-header h2 {
+  font-family: 'Lora', serif;
+  font-weight: 600;
+  font-size: 1.5rem;
+  color: #333333;
+  margin: 0;
+}
+
+.page-header p {
+  font-family: 'Lora', serif;
+  font-weight: 600;
+  color: #666666;
+  margin: 0.25rem 0 0;
+  font-size: 0.9rem;
+}
+
+.btn-action {
+  background: linear-gradient(145deg, #FB6F92, #FF8FAB);
+  color: white;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 12px;
+  font-family: 'Lora', serif;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(251, 111, 146, 0.3);
+}
+
+.btn-action:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(251, 111, 146, 0.4);
+  color: white;
+  background: linear-gradient(145deg, #FF8FAB, #FFB3C6);
+}
+
+.enterprise-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.e-card {
+  aspect-ratio: 1 / 1;
+  border-radius: 20px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  text-decoration: none;
+  background: linear-gradient(145deg, #FB6F92, #FF8FAB);
+  color: #1a1a1a;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 30px rgba(251, 111, 146, 0.3);
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+.e-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(251, 111, 146, 0.4);
+  color: #1a1a1a;
+  background: linear-gradient(145deg, #FF8FAB, #FFB3C6);
+}
+
+.card-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  color: #1a1a1a;
+}
+
+.card-value {
+  font-family: 'Lora', serif;
+  font-weight: 700;
+  font-size: 2.25rem;
+  line-height: 1;
+  margin-bottom: 0.3rem;
+  color: #1a1a1a;
+}
+
+.card-label {
+  font-family: 'Lora', serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #333333;
+}
+
+.section-title {
+  font-family: 'Lora', serif;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #333333;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Entry Cards */
+.entry-card {
+  aspect-ratio: 1 / 1;
+  background: linear-gradient(145deg, #FB6F92, #FF8FAB);
+  border-radius: 20px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: #1a1a1a;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 30px rgba(251, 111, 146, 0.3);
+}
+
+.entry-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(251, 111, 146, 0.4);
+  color: #1a1a1a;
+  background: linear-gradient(145deg, #FF8FAB, #FFB3C6);
+}
+
+.entry-date {
+  font-family: 'Lora', serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: #333333;
+  margin-bottom: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.entry-content {
+  font-family: 'Lora', serif;
+  font-weight: 600;
+  flex: 1;
+  font-size: 0.85rem;
+  color: #1a1a1a;
+  line-height: 1.5;
+  overflow: hidden;
+}
+
+.entry-footer {
+  margin-top: auto;
+  padding-top: 0.75rem;
+}
+
+.entry-badge {
+  background: rgba(255,255,255,0.5);
+  color: #1a1a1a;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-family: 'Lora', serif;
+  font-weight: 700;
+  font-size: 0.7rem;
+}
+
+.empty-state { grid-column: span 2; }
+
+@media (max-width: 1024px) {
+  .enterprise-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .page-container { padding: 1rem; }
+  .enterprise-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  .page-header { flex-direction: column; align-items: flex-start; }
+  .card-value { font-size: 1.75rem; }
+  .card-icon { width: 44px; height: 44px; font-size: 1.2rem; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h2><i class="fas fa-book-open me-2"></i>My Diary</h2>
+      <p>Your thoughts, memories, and reflections.</p>
+    </div>
+    <a href="{% url 'diary_write' %}" class="btn-action">
+      <i class="fas fa-pen me-2"></i>Write Today
+    </a>
+  </div>
+
+  <div class="enterprise-grid">
+    <div class="e-card">
+      <div class="card-icon"><i class="fas fa-fire"></i></div>
+      <div class="card-value">{{ streak }}</div>
+      <div class="card-label">Day Streak</div>
+    </div>
+    <div class="e-card">
+      <div class="card-icon"><i class="fas fa-book"></i></div>
+      <div class="card-value">{{ total_entries }}</div>
+      <div class="card-label">Total Entries</div>
+    </div>
+    <div class="e-card">
+      <div class="card-icon"><i class="fas fa-calendar-alt"></i></div>
+      <div class="card-value">{{ entries|length }}</div>
+      <div class="card-label">This Month</div>
+    </div>
+    <a href="{% url 'diary_summary' %}" class="e-card">
+      <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+      <div class="card-label">View Insights</div>
+    </a>
+  </div>
+
+  <div class="enterprise-grid" style="margin-bottom: 2rem;">
+    <a href="{% url 'diary_write' %}" class="e-card">
+      <div class="card-icon"><i class="fas fa-pen"></i></div>
+      <div class="card-label">Write Entry</div>
+    </a>
+    <a href="{% url 'diary_calendar' %}" class="e-card">
+      <div class="card-icon"><i class="fas fa-calendar"></i></div>
+      <div class="card-label">Calendar</div>
+    </a>
+  </div>
+
+  <h3 class="section-title"><i class="fas fa-history"></i> Recent Entries</h3>
+  
+  {% if entries %}
+    <div class="enterprise-grid">
+      {% for entry in entries %}
+      <a href="{% url 'diary_entry_detail' entry.pk %}" class="entry-card">
+        <div class="entry-date">
+          <span><i class="far fa-calendar me-1"></i>{{ entry.entry_date|date:"M d, Y" }}</span>
+          {% if entry.mood %}
+            <span>{% if entry.mood == 1 %}😔{% elif entry.mood == 2 %}😕{% elif entry.mood == 3 %}😐{% elif entry.mood == 4 %}🙂{% else %}😊{% endif %}</span>
+          {% endif %}
+        </div>
+        <div class="entry-content">
+          {% if entry.content %}{{ entry.content|truncatechars:100 }}{% else %}<em style="color: rgba(226,232,240,0.4);">No text content</em>{% endif %}
+        </div>
+        <div class="entry-footer">
+          <span class="entry-badge">
+            {% if entry.input_method == 'voice' %}<i class="fas fa-microphone me-1"></i> Voice
+            {% elif entry.input_method == 'stylus' %}<i class="fas fa-pen me-1"></i> Written
+            {% else %}<i class="fas fa-keyboard me-1"></i> Typed{% endif %}
+          </span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="enterprise-grid">
+      <a href="{% url 'diary_write' %}" class="e-card empty-state">
+        <div class="card-icon"><i class="fas fa-pen-fancy"></i></div>
+        <div class="card-label">Write Your First Entry</div>
+      </a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

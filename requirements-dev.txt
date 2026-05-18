@@ -1,0 +1,12 @@
+# Dev / test only. Runtime deps live in requirements.txt.
+-r requirements.txt
+
+# Unit + E2E test stack
+pytest==8.3.3
+pytest-django==4.9.0
+pytest-playwright==0.5.2
+playwright==1.47.0
+axe-playwright-python==0.1.4
+
+# Lint
+ruff==0.6.9

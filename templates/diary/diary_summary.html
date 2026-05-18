@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Diary Summary - JaytiPargal.in{% endblock %}
+
+{% block content %}
+<div class="page-shell">
+    <div class="page-hero">
+        <div class="page-hero-copy">
+            <h1>Diary Insights</h1>
+            <p>A calm summary of your recent rhythm, mood tracking, and writing consistency.</p>
+        </div>
+        <div class="page-actions">
+            <a href="{% url 'diary_overview' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Diary
+            </a>
+        </div>
+    </div>
+
+    <div class="shell-grid shell-grid-4 mb-4">
+        <div class="shell-stat">
+            <div class="shell-stat-top"><span>Current Streak</span><i class="fas fa-fire"></i></div>
+            <div class="shell-stat-value">{{ streak }}</div>
+            <div class="shell-stat-note">Consecutive writing days.</div>
+        </div>
+        <div class="shell-stat">
+            <div class="shell-stat-top"><span>This Week</span><i class="fas fa-calendar-week"></i></div>
+            <div class="shell-stat-value">{{ week_count }}</div>
+            <div class="shell-stat-note">Entries in the last 7 days.</div>
+        </div>
+        <div class="shell-stat">
+            <div class="shell-stat-top"><span>This Month</span><i class="fas fa-calendar-alt"></i></div>
+            <div class="shell-stat-value">{{ month_count }}</div>
+            <div class="shell-stat-note">Entries in the last 30 days.</div>
+        </div>
+        <div class="shell-stat">
+            <div class="shell-stat-top"><span>Average Mood</span><i class="fas fa-heart"></i></div>
+            <div class="shell-stat-value">{% if avg_mood %}{{ avg_mood|floatformat:1 }}{% else %}-{% endif %}</div>
+            <div class="shell-stat-note">Based on entries with mood selected.</div>
+        </div>
+    </div>
+
+    <div class="shell-sidebar-layout">
+        <div class="shell-card">
+            <div class="shell-card-header">
+                <div class="section-heading mb-0">
+                    <h4>This Week's Entries</h4>
+                </div>
+            </div>
+            <div class="shell-card-body">
+                {% if week_entries %}
+                <div class="list-stack">
+                    {% for entry in week_entries %}
+                    <div class="list-row">
+                        <div>
+                            <a href="{% url 'diary_entry_detail' entry.pk %}">{{ entry.entry_date|date:"D, M d" }}</a>
+                            <div class="text-muted small mt-1">{% if entry.mood %}{{ entry.get_mood_display }}{% else %}Mood not tracked{% endif %}</div>
+                        </div>
+                        <i class="fas fa-chevron-right text-muted"></i>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-shell">
+                    <h5>No entries this week yet</h5>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="shell-grid">
+            <div class="shell-panel">
+                <div class="section-heading mb-2"><h5>Mood Scale</h5></div>
+                <div class="meta-list">
+                    <div class="meta-row"><div class="meta-label">1</div><div class="meta-value">Struggling</div></div>
+                    <div class="meta-row"><div class="meta-label">2</div><div class="meta-value">Difficult</div></div>
+                    <div class="meta-row"><div class="meta-label">3</div><div class="meta-value">Neutral</div></div>
+                    <div class="meta-row"><div class="meta-label">4</div><div class="meta-value">Good</div></div>
+                    <div class="meta-row"><div class="meta-label">5</div><div class="meta-value">Great</div></div>
+                </div>
+            </div>
+
+            <div class="surface-note">
+                <strong>Writing tips:</strong> keep entries honest, write regularly, and use mood tracking when you want clearer patterns over time.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

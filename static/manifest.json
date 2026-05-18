@@ -1,0 +1,43 @@
+{
+  "name": "Jayti - Personal Life Companion",
+  "short_name": "Jayti",
+  "description": "Your personal space for notes, diary, goals, and AI guidance",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFF5F7",
+  "theme_color": "#D4A5A5",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/static/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["lifestyle", "productivity", "health"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Write Diary",
+      "url": "/diary/write/",
+      "description": "Quick access to diary writing"
+    },
+    {
+      "name": "New Note",
+      "url": "/notes/create/",
+      "description": "Create a new note"
+    },
+    {
+      "name": "AI Chat",
+      "url": "/ai-chat/",
+      "description": "Chat with AI companion"
+    }
+  ]
+}

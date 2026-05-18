@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}Tangred{% endblock %}
+
+{% block content %}
+<div class="page-shell page-shell-wide">
+    <div class="page-hero">
+        <div class="page-hero-copy">
+            <h1>Tangred</h1>
+            <p>Your in-house wardrobe agent. Save reference photos inside the app, shape a dressing goal, and let Tangred generate a personalized outfit direction plus a Stitch-backed styleboard.</p>
+        </div>
+        <div class="page-actions">
+            <a href="{% url 'tan_studio_home' %}" class="btn btn-outline-secondary">Open Tan Studio</a>
+        </div>
+    </div>
+
+    <div class="shell-grid shell-grid-3 mb-4">
+        <div class="shell-stat">
+            <div class="shell-stat-top"><span>Sessions</span><i class="fas fa-layer-group"></i></div>
+            <div class="shell-stat-value">{{ stats.session_count }}</div>
+            <div class="shell-stat-note">Private wardrobe sessions saved in-app.</div>
+        </div>
+        <div class="shell-stat">
+            <div class="shell-stat-top"><span>Ready Looks</span><i class="fas fa-shirt"></i></div>
+            <div class="shell-stat-value">{{ stats.ready_count }}</div>
+            <div class="shell-stat-note">Sessions with completed Tangred guidance.</div>
+        </div>
+        <div class="shell-stat">
+            <div class="shell-stat-top"><span>AI Stack</span><i class="fas fa-sparkles"></i></div>
+            <div class="shell-stat-value">{% if agent_ready and stitch_ready %}Live{% elif agent_ready %}Agent Only{% else %}Off{% endif %}</div>
+            <div class="shell-stat-note">{% if agent_ready and stitch_ready %}OpenRouter + Stitch are ready for Tangred.{% elif agent_ready %}Tangred can analyze sessions, but Stitch styleboards are currently unavailable.{% else %}Configure OpenRouter to enable Tangred.{% endif %}</div>
+        </div>
+    </div>
+
+    <div class="shell-sidebar-layout">
+        <div class="shell-grid">
+            <div class="shell-card">
+                <div class="shell-card-header">
+                    <div class="section-heading mb-0">
+                        <h4>Your Tangred Sessions</h4>
+                        <span class="chip">{{ sessions|length }} total</span>
+                    </div>
+                </div>
+                <div class="shell-card-body">
+                    {% if sessions %}
+                    <div class="list-stack">
+                        {% for session in sessions %}
+                        <div class="list-row" style="align-items: flex-start;">
+                            <div>
+                                <a href="{% url 'tangred_session_detail' session.pk %}">{{ session.title }}</a>
+                                <div class="text-muted small mt-1">{{ session.occasion|default:"General wardrobe direction" }} · {{ session.photo_count }} photo{{ session.photo_count|pluralize }}</div>
+                                {% if session.style_identity %}
+                                <div class="text-muted small mt-1">{{ session.style_identity }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="chip-row">
+                                <span class="chip chip-soft">{{ session.get_status_display }}</span>
+                                <a href="{% url 'tangred_session_detail' session.pk %}" class="btn btn-sm btn-outline-secondary">Open</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-shell">
+                        <h4>No Tangred sessions yet</h4>
+                        <p class="text-muted">Create the first wardrobe session and Tangred will keep everything private inside this app.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="shell-grid">
+            <div class="shell-card">
+                <div class="shell-card-header">
+                    <div class="section-heading mb-0">
+                        <h4>Start A Session</h4>
+                    </div>
+                </div>
+                <div class="shell-card-body">
+                    <form method="post" action="{% url 'tangred_create_session' %}" enctype="multipart/form-data" class="shell-form">
+                        {% csrf_token %}
+                        <div>
+                            <label class="form-label">Session Title</label>
+                            <input type="text" name="title" class="form-control" placeholder="Boardroom Weekend Refresh" required>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Occasion</label>
+                                <input type="text" name="occasion" class="form-control" placeholder="Wedding guest, founder meetings, daily office">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Body Frame</label>
+                                <input type="text" name="body_frame" class="form-control" placeholder="Lean, athletic, broad shoulders">
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Skin Tone</label>
+                                <input type="text" name="skin_tone" class="form-control" placeholder="Warm wheatish, neutral olive, cool beige">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Preferred Palette</label>
+                                <input type="text" name="preferred_palette" class="form-control" placeholder="Charcoal, tan, ivory, forest green">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="form-label">Avoid Palette</label>
+                            <input type="text" name="avoid_palette" class="form-control" placeholder="Neon tones, pure white, very icy blues">
+                        </div>
+                        <div>
+                            <label class="form-label">Style Goal</label>
+                            <textarea name="style_goal" class="form-control" rows="4" placeholder="Describe how you want to look, feel, and be perceived when dressed up."></textarea>
+                        </div>
+                        <div>
+                            <label class="form-label">Wardrobe Notes</label>
+                            <textarea name="wardrobe_notes" class="form-control" rows="4" placeholder="Mention current wardrobe gaps, favorite fits, footwear habits, layering preference, or anything Tangred should consider."></textarea>
+                        </div>
+                        <div>
+                            <label class="form-label">Reference Photos</label>
+                            <input type="file" name="photos" class="form-control" accept="image/*" multiple required>
+                            <div class="text-muted small mt-2">Upload one or more reference photos. They stay inside the application.</div>
+                        </div>
+                        <div class="shell-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Create Tangred Session
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="surface-note">
+                <strong>Tangred flow:</strong> save photos in private app storage, run the agent for wardrobe guidance, then generate a visual styleboard through Tan Studio and Stitch when you want a more designed presentation.
+                <div class="text-muted small mt-2">Current photo backend: {{ photo_storage_backend|title }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

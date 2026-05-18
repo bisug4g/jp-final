@@ -1,0 +1,416 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}Birth Chart - jayti{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chart-container {
+        position: relative;
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+        aspect-ratio: 1;
+    }
+    
+    .vedic-chart {
+        width: 100%;
+        height: 100%;
+    }
+    
+    .house-path {
+        fill: rgba(255, 255, 255, 0.7);
+        stroke: var(--blush-rose);
+        stroke-width: 2;
+        transition: all 0.3s ease;
+    }
+    
+    .house-path:hover {
+        fill: rgba(244, 194, 194, 0.2);
+    }
+    
+    .house-number {
+        font-family: 'Playfair Display', serif;
+        font-size: 14px;
+        fill: var(--muted-mauve);
+        font-weight: 600;
+    }
+    
+    .house-rashi {
+        font-family: 'Lato', sans-serif;
+        font-size: 11px;
+        fill: var(--warm-charcoal);
+    }
+    
+    .planet-symbol {
+        font-size: 20px;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+    
+    .planet-symbol:hover {
+        transform: scale(1.3);
+    }
+    
+    .planet-label {
+        font-family: 'Lato', sans-serif;
+        font-size: 10px;
+        fill: var(--warm-charcoal);
+    }
+    
+    .ascendant-marker {
+        fill: var(--dusty-rose);
+    }
+    
+    .chart-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 1.5rem;
+    }
+    
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .legend-symbol {
+        font-size: 1.2rem;
+    }
+    
+    .house-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid var(--blush-rose);
+        transition: all 0.3s ease;
+    }
+    
+    .house-card:hover {
+        box-shadow: 0 4px 20px rgba(244, 194, 194, 0.2);
+        transform: translateX(5px);
+    }
+    
+    .planet-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        background: rgba(244, 194, 194, 0.2);
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        margin: 0.25rem;
+    }
+    
+    .planet-badge a {
+        color: var(--warm-charcoal);
+        text-decoration: none;
+    }
+    
+    .planet-badge a:hover {
+        color: var(--dusty-rose);
+    }
+    
+    .chart-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        justify-content: center;
+    }
+    
+    .chart-tab {
+        padding: 0.75rem 1.5rem;
+        border: 2px solid rgba(244, 194, 194, 0.3);
+        background: white;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: 'Lato', sans-serif;
+    }
+    
+    .chart-tab:hover,
+    .chart-tab.active {
+        background: linear-gradient(135deg, var(--blush-rose), var(--dusty-rose));
+        color: white;
+        border-color: transparent;
+    }
+    
+    .chart-content {
+        display: none;
+    }
+    
+    .chart-content.active {
+        display: block;
+        animation: fadeIn 0.5s ease;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-5 mb-3">Your Vedic Birth Chart</h1>
+        <p class="text-mauve">
+            <i class="fas fa-calendar-alt me-2"></i>{{ birth_data.day }} {{ birth_data.month|month_name }} {{ birth_data.year }}
+            <span class="mx-2">|</span>
+            <i class="fas fa-clock me-2"></i>{{ birth_data.hour }}:{{ birth_data.minute|format_minute }}
+            <span class="mx-2">|</span>
+            <i class="fas fa-map-marker-alt me-2"></i>{{ birth_data.location }}
+        </p>
+        <p class="text-muted">
+            Ascendant: <strong class="text-blush">{{ ascendant|title }}</strong>
+            <span class="mx-2">|</span>
+            Element: <strong>{{ rashi_info.element }}</strong>
+            <span class="mx-2">|</span>
+            Quality: <strong>{{ rashi_info.quality }}</strong>
+        </p>
+    </div>
+    
+    <!-- Chart Tabs -->
+    <div class="chart-tabs">
+        <button class="chart-tab active" onclick="showChartTab('visual')">
+            <i class="fas fa-circle me-2"></i>Visual Chart
+        </button>
+        <button class="chart-tab" onclick="showChartTab('list')">
+            <i class="fas fa-list me-2"></i>House List
+        </button>
+        <button class="chart-tab" onclick="showChartTab('planets')">
+            <i class="fas fa-star me-2"></i>Planet Positions
+        </button>
+    </div>
+    
+    <!-- Visual Chart -->
+    <div id="visualChart" class="chart-content active">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <svg class="vedic-chart" viewBox="0 0 400 400">
+                                <!-- Diamond shape houses -->
+                                <!-- House 1 (Top) -->
+                                <path d="M200,200 L200,50 L300,100 L200,200" class="house-path" />
+                                <text x="235" y="115" class="house-number">1</text>
+                                <text x="225" y="130" class="house-rashi">{{ chart.0.rashi|truncatechars:3 }}</text>
+                                
+                                <!-- House 2 -->
+                                <path d="M200,200 L300,100 L350,200 L200,200" class="house-path" />
+                                <text x="320" y="165" class="house-number">2</text>
+                                <text x="325" y="180" class="house-rashi">{{ chart.1.rashi|truncatechars:3 }}</text>
+                                
+                                <!-- House 3 -->
+                                <path d="M200,200 L350,200 L300,300 L200,200" class="house-path" />
+                                <text x="315" y="255" class="house-number">3</text>
+                                <text x="300" y="270" class="house-rashi">{{ chart.2.rashi|truncatechars:3 }}</text>
+                                
+                                <!-- House 4 (Bottom Right) -->
+                                <path d="M200,200 L300,300 L200,350 L200,200" class="house-path" />
+                                <text x="255" y="315" class="house-number">4</text>
+                                <text x="245" y="330" class="house-rashi">{{ chart.3.rashi|truncatechars:3 }}</text>
+                                
+                                <!-- House 5 -->
+                                <path d="M200,200 L200,350 L100,300 L200,200" class="house-path" />
+                                <text x="155" y="325" class="house-number">5</text>
+                                <text x="145" y="340" class="house-rashi">{{ chart.4.rashi|truncatechars:3 }}</text>
+                                
+                                <!-- House 6 -->
+                                <path d="M200,200 L100,300 L50,200 L200,200" class="house-path" />
+                                <text x="85" y="255" class="house-number">6</text>
+                                <text x="75" y="270" class="house-rashi">{{ chart.5.rashi|truncatechars:3 }}</text>
+                                
+                                <!-- House 7 (Bottom) -->
+                                <path d="M200,200 L50,200 L100,100 L200,200" class="house-path" />
+                                <text x="85" y="165" class="house-number">7</text>
+                                <text x="75" y="180" class="house-rashi">{{ chart.6.rashi|truncatechars:3 }}</text>
+                                
+                                <!-- House 8 -->
+                                <path d="M200,200 L100,100 L200,50 L200,200" class="house-path" />
+                                <text x="150" y="115" class="house-number">8</text>
+                                <text x="140" y="130" class="house-rashi">{{ chart.7.rashi|truncatechars:3 }}</text>
+                                
+                                <!-- Inner circle for center planets -->
+                                <circle cx="200" cy="200" r="40" fill="rgba(244,194,194,0.2)" stroke="var(--blush-rose)" stroke-width="2" />
+                                <text x="190" y="205" class="house-rashi" style="font-weight: bold;">ASC</text>
+                                
+                                <!-- Planet positions -->
+                                {% for planet in planets %}
+                                <g class="planet-group" data-planet="{{ planet.name }}">
+                                    {% if planet.house == 1 %}
+                                    <text x="220" y="90" class="planet-symbol" text-anchor="middle">{{ planet.symbol }}</text>
+                                    {% elif planet.house == 2 %}
+                                    <text x="320" y="140" class="planet-symbol" text-anchor="middle">{{ planet.symbol }}</text>
+                                    {% elif planet.house == 3 %}
+                                    <text x="330" y="250" class="planet-symbol" text-anchor="middle">{{ planet.symbol }}</text>
+                                    {% elif planet.house == 4 %}
+                                    <text x="250" y="330" class="planet-symbol" text-anchor="middle">{{ planet.symbol }}</text>
+                                    {% elif planet.house == 5 %}
+                                    <text x="150" y="340" class="planet-symbol" text-anchor="middle">{{ planet.symbol }}</text>
+                                    {% elif planet.house == 6 %}
+                                    <text x="70" y="280" class="planet-symbol" text-anchor="middle">{{ planet.symbol }}</text>
+                                    {% elif planet.house == 7 %}
+                                    <text x="70" y="170" class="planet-symbol" text-anchor="middle">{{ planet.symbol }}</text>
+                                    {% elif planet.house == 8 %}
+                                    <text x="130" y="90" class="planet-symbol" text-anchor="middle">{{ planet.symbol }}</text>
+                                    {% elif planet.house == 9 %}
+                                    <text x="200" y="80" class="planet-symbol" text-anchor="middle">{{ planet.symbol }}</text>
+                                    {% elif planet.house == 10 %}
+                                    <text x="280" y="80" class="planet-symbol" text-anchor="middle">{{ planet.symbol }}</text>
+                                    {% elif planet.house == 11 %}
+                                    <text x="340" y="120" class="planet-symbol" text-anchor="middle">{{ planet.symbol }}</text>
+                                    {% elif planet.house == 12 %}
+                                    <text x="340" y="200" class="planet-symbol" text-anchor="middle">{{ planet.symbol }}</text>
+                                    {% endif %}
+                                </g>
+                                {% endfor %}
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header bg-transparent">
+                        <h5 class="mb-0"><i class="fas fa-info-circle me-2 text-blush"></i>Chart Legend</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-legend">
+                            {% for planet in planets %}
+                            <div class="legend-item">
+                                <span class="legend-symbol">{{ planet.symbol }}</span>
+                                <a href="{% url 'planet_detail' planet=planet.name %}">{{ planet.name|title }}</a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <hr class="my-3">
+                        
+                        <h6 class="mb-2">House Strength</h6>
+                        <div class="small text-muted">
+                            <p><span class="badge bg-success">Strong (25-36)</span> Excellent planetary support</p>
+                            <p><span class="badge bg-warning">Moderate (18-24)</span> Balanced energy</p>
+                            <p><span class="badge bg-secondary">Gentle (0-17)</span> Requires attention</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- House List -->
+    <div id="listChart" class="chart-content">
+        <div class="row">
+            {% for house in chart %}
+            <div class="col-md-6">
+                <div class="house-card">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="mb-0">
+                            House {{ house.number }}
+                            <small class="text-muted">| {{ house.rashi|title }}</small>
+                        </h5>
+                        <span class="badge {% if house.score >= 25 %}bg-success{% elif house.score >= 18 %}bg-warning{% else %}bg-secondary{% endif %}">
+                            Score: {{ house.score }}
+                        </span>
+                    </div>
+                    <p class="text-muted small mb-2">
+                        Lord: {{ house.lord|title }}
+                        {% if house.rashi_info %}
+                        <span class="mx-1">|</span>
+                        {{ house.rashi_info.symbol }} {{ house.rashi_info.element }}
+                        {% endif %}
+                    </p>
+                    {% if house.planets %}
+                    <div class="mt-2">
+                        <small class="text-muted d-block mb-1">Planets:</small>
+                        {% for planet in house.planets %}
+                        <span class="planet-badge">
+                            <a href="{% url 'planet_detail' planet=planet.name %}">
+                                {{ planet.symbol }} {{ planet.name|title }}
+                                <small>({{ planet.degree|floatformat:1 }}°)</small>
+                            </a>
+                        </span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted small mb-0"><em>No planets in this house</em></p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Planet Positions -->
+    <div id="planetsChart" class="chart-content">
+        <div class="row">
+            {% for planet in planets %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">{{ planet.symbol }}</div>
+                        <h5 class="card-title">{{ planet.name|title }}</h5>
+                        <p class="text-muted mb-2">House {{ planet.house }} | {{ planet.rashi|title }}</p>
+                        <p class="small text-muted mb-2">{{ planet.degree|floatformat:2 }}° | {{ planet.nakshatra }}</p>
+                        <a href="{% url 'planet_detail' planet=planet.name %}" class="btn btn-outline-primary btn-sm">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Navigation -->
+    <div class="text-center mt-5">
+        <a href="{% url 'astro_dashboard' %}" class="btn btn-outline-secondary me-2">
+            <i class="fas fa-arrow-left me-2"></i>Back to Astro
+        </a>
+        <a href="{% url 'house_details' %}" class="btn btn-outline-primary me-2">
+            <i class="fas fa-home me-2"></i>House Details
+        </a>
+        <a href="{% url 'predictions' %}" class="btn btn-primary">
+            <i class="fas fa-star me-2"></i>View Predictions
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function showChartTab(tabName) {
+        // Hide all contents
+        document.querySelectorAll('.chart-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        
+        // Remove active class from all tabs
+        document.querySelectorAll('.chart-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        
+        // Show selected content
+        document.getElementById(tabName + 'Chart').classList.add('active');
+        
+        // Add active class to clicked tab
+        event.target.classList.add('active');
+    }
+    
+    // Add click handlers for planet symbols in visual chart
+    document.querySelectorAll('.planet-symbol').forEach(symbol => {
+        symbol.addEventListener('click', function() {
+            const planetGroup = this.closest('.planet-group');
+            if (planetGroup) {
+                const planetName = planetGroup.getAttribute('data-planet');
+                if (planetName) {
+                    window.location.href = `/astro/planet/${planetName}/`;
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

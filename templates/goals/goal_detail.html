@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ goal.title }} - Goals{% endblock %}
+
+{% block content %}
+<div class="page-shell page-shell-wide">
+    <div class="page-breadcrumbs">
+        <a href="{% url 'goal_list' %}">Goals</a>
+        <span>/</span>
+        <span class="current">{{ goal.title|truncatechars:40 }}</span>
+    </div>
+
+    <div class="page-hero">
+        <div class="page-hero-copy">
+            <h1>{{ goal.title }}</h1>
+            <p>{{ goal.description|default:"A structured career goal with tasks and milestone tracking." }}</p>
+        </div>
+        <div class="page-actions">
+            <a href="{% url 'goal_edit' goal.pk %}" class="btn btn-primary">
+                <i class="fas fa-pen-to-square me-2"></i>Edit Goal
+            </a>
+            <a href="{% url 'regenerate_ai_tasks' goal.pk %}" class="btn btn-outline-secondary">
+                <i class="fas fa-wand-magic-sparkles me-2"></i>Regenerate Tasks
+            </a>
+            <a href="{% url 'goal_delete' goal.pk %}" class="btn btn-outline-danger">
+                <i class="fas fa-trash me-2"></i>Delete
+            </a>
+        </div>
+    </div>
+
+    <div class="shell-grid shell-grid-4 mb-4">
+        <div class="shell-stat">
+            <div class="shell-stat-top"><span>Progress</span><i class="fas fa-chart-line"></i></div>
+            <div class="shell-stat-value">{{ goal.completion_percentage }}%</div>
+            <div class="shell-stat-note">Completion based on finished tasks.</div>
+        </div>
+        <div class="shell-stat">
+            <div class="shell-stat-top"><span>Tasks Done</span><i class="fas fa-check"></i></div>
+            <div class="shell-stat-value">{{ tasks_done_count }}</div>
+            <div class="shell-stat-note">Tasks marked complete.</div>
+        </div>
+        <div class="shell-stat">
+            <div class="shell-stat-top"><span>In Motion</span><i class="fas fa-bolt"></i></div>
+            <div class="shell-stat-value">{{ tasks_in_progress_count }}</div>
+            <div class="shell-stat-note">Tasks currently underway.</div>
+        </div>
+        <div class="shell-stat">
+            <div class="shell-stat-top"><span>Pending</span><i class="fas fa-clock"></i></div>
+            <div class="shell-stat-value">{{ tasks_pending_count|add:tasks_blocked_count }}</div>
+            <div class="shell-stat-note">Open work still needing attention.</div>
+        </div>
+    </div>
+
+    <div class="shell-sidebar-layout">
+        <div class="shell-grid">
+            <div class="shell-card">
+                <div class="shell-card-header">
+                    <div class="section-heading mb-0">
+                        <div>
+                            <h4>Task Map</h4>
+                            <p class="section-subtitle">Organized by department so the plan stays easy to scan.</p>
+                        </div>
+                        <a href="{% url 'task_create' goal.pk %}" class="btn btn-sm btn-primary">Add Task</a>
+                    </div>
+                </div>
+                <div class="shell-card-body">
+                    {% if tasks_by_department %}
+                    <div class="task-board">
+                        {% for department in tasks_by_department %}
+                        <div class="task-group">
+                            <div class="task-group-header">
+                                <div>
+                                    <h5>{{ department.label }}</h5>
+                                    <div class="text-muted small">{{ department.completed }} of {{ department.count }} complete</div>
+                                </div>
+                                <span class="chip">{{ department.count }} tasks</span>
+                            </div>
+                            {% for task in department.tasks %}
+                            <div class="task-item">
+                                <div>
+                                    <h6>{{ task.title }}</h6>
+                                    <p>{{ task.description|default:"No extra detail added yet." }}</p>
+                                    <div class="task-meta">
+                                        <span class="chip {% if task.status == 'done' %}chip-success{% elif task.status == 'blocked' or task.status == 'overdue' %}chip-danger{% elif task.status == 'at_risk' %}chip-warning{% else %}chip-soft{% endif %}">
+                                            {{ task.get_status_display }}
+                                        </span>
+                                        <span class="chip">Due {{ task.due_date|date:"M d, Y" }}</span>
+                                        {% if task.completion_percentage %}
+                                        <span class="chip">{{ task.completion_percentage }}%</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="task-actions">
+                                    <a href="{% url 'task_update' task.pk %}" class="btn btn-sm btn-outline-secondary">Update</a>
+                                    <a href="{% url 'task_delete' task.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-shell">
+                        <h4>No tasks yet</h4>
+                        <p class="text-muted">Generate or add tasks to turn this goal into a concrete plan.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if milestones %}
+            <div class="shell-card">
+                <div class="shell-card-header">
+                    <div class="section-heading mb-0"><h4>Milestones</h4></div>
+                </div>
+                <div class="shell-card-body">
+                    <div class="list-stack">
+                        {% for milestone in milestones %}
+                        <div class="list-row">
+                            <div>
+                                <strong>{{ milestone.title }}</strong>
+                                <div class="text-muted small">{{ milestone.target_date|date:"F Y" }}</div>
+                            </div>
+                            <span class="chip {% if milestone.is_achieved %}chip-success{% else %}chip-soft{% endif %}">
+                                {% if milestone.is_achieved %}Achieved{% else %}Upcoming{% endif %}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="shell-grid">
+            <div class="shell-panel">
+                <div class="section-heading mb-2"><h5>Goal Details</h5></div>
+                <div class="chip-row mb-3">
+                    <span class="chip">{{ goal.get_time_horizon_display }}</span>
+                    <span class="chip">{{ goal.get_role_category_display }}</span>
+                    <span class="chip">{{ goal.get_experience_level_display }}</span>
+                </div>
+                <div class="meta-list">
+                    <div class="meta-row">
+                        <div class="meta-label">Status</div>
+                        <div class="meta-value">{{ goal.get_status_display }}</div>
+                    </div>
+                    <div class="meta-row">
+                        <div class="meta-label">Target Date</div>
+                        <div class="meta-value">{{ goal.target_date|date:"F d, Y" }}</div>
+                    </div>
+                    <div class="meta-row">
+                        <div class="meta-label">Blocked Tasks</div>
+                        <div class="meta-value">{{ tasks_blocked_count }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="surface-note">
+                <strong>Planning principle:</strong> the best goals stay specific, time-bound, and visible at both the milestone and task level.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

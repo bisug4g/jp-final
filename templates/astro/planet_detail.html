@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ planet|title }} - JaytiPargal.in{% endblock %}
+
+{% block content %}
+<div class="page-shell" style="max-width: 980px;">
+    <div class="page-breadcrumbs">
+        <a href="{% url 'astro_dashboard' %}">Astro</a>
+        <span>/</span>
+        <a href="{% url 'birth_chart' %}">Birth Chart</a>
+        <span>/</span>
+        <span class="current">{{ planet|title }}</span>
+    </div>
+
+    <div class="shell-card">
+        <div class="shell-card-body">
+            <div class="page-hero mb-0">
+                <div class="page-hero-copy">
+                    <h1>{{ info.symbol }} {{ planet|title }}</h1>
+                    <p>{{ info.represents }}</p>
+                </div>
+                <div class="page-actions">
+                    <a href="{% url 'birth_chart' %}" class="btn btn-outline-secondary">Back to Chart</a>
+                </div>
+            </div>
+
+            <div class="shell-sidebar-layout mt-4">
+                <div class="shell-panel">
+                    <div class="section-heading mb-2"><h5>Placement</h5></div>
+                    <div class="meta-list">
+                        <div class="meta-row"><div class="meta-label">House</div><div class="meta-value">{{ house }}</div></div>
+                        <div class="meta-row"><div class="meta-label">Rashi</div><div class="meta-value">{{ rashi_info.symbol }} {{ rashi|title }}</div></div>
+                        <div class="meta-row"><div class="meta-label">Degree</div><div class="meta-value">{{ data.degree_in_rashi }}°</div></div>
+                        <div class="meta-row"><div class="meta-label">Nakshatra</div><div class="meta-value">{{ data.nakshatra }}{% if data.pada %}, Pada {{ data.pada }}{% endif %}</div></div>
+                        <div class="meta-row"><div class="meta-label">Element</div><div class="meta-value">{{ info.element }}</div></div>
+                    </div>
+                </div>
+
+                <div class="shell-card">
+                    <div class="shell-card-header">
+                        <div class="section-heading mb-0"><h4>Interpretation</h4></div>
+                    </div>
+                    <div class="shell-card-body">
+                        <div class="prose-surface">
+                            <p>{{ interpretation }}</p>
+                        </div>
+                        <div class="surface-note mt-3">
+                            <strong>Key theme:</strong> {{ info.represents }} become more visible through the life topics of the {{ house }} house.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

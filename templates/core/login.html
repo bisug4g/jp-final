@@ -1,0 +1,531 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Welcome - Jayti{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background:
+            radial-gradient(circle at top left, rgba(251, 111, 146, 0.25), transparent 32%),
+            radial-gradient(circle at bottom right, rgba(255, 194, 209, 0.35), transparent 28%),
+            linear-gradient(160deg, #fff3f6 0%, #ffe6ee 42%, #ffeef3 100%);
+    }
+
+    .login-shell {
+        min-height: calc(100vh - 2rem);
+        display: grid;
+        align-items: center;
+        padding: 1.25rem;
+    }
+
+    .login-stage {
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+        display: grid;
+        grid-template-columns: minmax(0, 460px) minmax(0, 1fr);
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(255, 143, 171, 0.25);
+        border-radius: 32px;
+        box-shadow: 0 28px 80px rgba(214, 98, 128, 0.18);
+        backdrop-filter: blur(16px);
+        overflow: hidden;
+    }
+
+    .login-panel {
+        padding: 2.5rem;
+        background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,245,247,0.9));
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .login-brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.45rem 0.85rem;
+        border-radius: 999px;
+        background: rgba(251, 111, 146, 0.12);
+        border: 1px solid rgba(251, 111, 146, 0.18);
+        font-size: 0.78rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: #b33f66;
+        margin-bottom: 1.25rem;
+        width: fit-content;
+    }
+
+    .login-title {
+        font-size: clamp(2.25rem, 4vw, 3.4rem);
+        line-height: 1;
+        margin-bottom: 0.9rem;
+        color: #1f1b1d;
+    }
+
+    .login-copy {
+        color: #6b5560;
+        font-size: 1.02rem;
+        line-height: 1.75;
+        margin-bottom: 1.5rem;
+        max-width: 34rem;
+    }
+
+    .login-form {
+        display: grid;
+        gap: 0.95rem;
+    }
+
+    .login-field label {
+        display: block;
+        font-size: 0.86rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: #9f5d74;
+        margin-bottom: 0.45rem;
+    }
+
+    .login-field input {
+        width: 100%;
+        border: 1px solid rgba(191, 126, 149, 0.24);
+        background: rgba(255, 255, 255, 0.92);
+        border-radius: 18px;
+        padding: 0.95rem 1rem;
+        font-size: 1rem;
+        color: #241b20;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.75);
+    }
+
+    .login-field input:focus {
+        outline: none;
+        border-color: rgba(251, 111, 146, 0.65);
+        box-shadow: 0 0 0 4px rgba(251, 111, 146, 0.14);
+    }
+
+    .login-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+        align-items: center;
+        margin-top: 0.5rem;
+    }
+
+    .login-btn {
+        min-width: 180px;
+    }
+
+    .login-note {
+        padding: 0.95rem 1rem;
+        border-radius: 18px;
+        background: rgba(251, 111, 146, 0.08);
+        border: 1px solid rgba(251, 111, 146, 0.15);
+        color: #7a5360;
+        font-size: 0.9rem;
+        margin-top: 1rem;
+    }
+
+    .login-meta {
+        margin-top: 1.25rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .meta-chip {
+        padding: 0.6rem 0.85rem;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.86);
+        border: 1px solid rgba(191, 126, 149, 0.2);
+        color: #755765;
+        font-size: 0.82rem;
+        font-weight: 600;
+    }
+
+    .login-visual {
+        position: relative;
+        min-height: 680px;
+        overflow: hidden;
+        background: #251c21;
+        color: white;
+    }
+
+    .flower-slideshow,
+    .flower-slide,
+    .visual-overlay {
+        position: absolute;
+        inset: 0;
+    }
+
+    .flower-slide {
+        background-size: cover;
+        background-position: center;
+        opacity: 0;
+        transition: opacity 1.8s ease;
+    }
+
+    .flower-slide.active {
+        opacity: 1;
+    }
+
+    .visual-overlay {
+        background:
+            linear-gradient(180deg, rgba(28, 21, 25, 0.18), rgba(28, 21, 25, 0.8)),
+            linear-gradient(135deg, rgba(251, 111, 146, 0.38), rgba(28, 21, 25, 0.24));
+        z-index: 1;
+    }
+
+    .visual-content {
+        position: relative;
+        z-index: 2;
+        height: 100%;
+        padding: 2.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .visual-kicker {
+        display: inline-flex;
+        width: fit-content;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.45rem 0.8rem;
+        border: 1px solid rgba(255,255,255,0.22);
+        border-radius: 999px;
+        background: rgba(255,255,255,0.08);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        font-size: 0.74rem;
+        font-weight: 700;
+        color: rgba(255,255,255,0.9);
+    }
+
+    .visual-quote {
+        max-width: 32rem;
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(1.5rem, 3vw, 2.4rem);
+        line-height: 1.35;
+        color: #fff8fb;
+        text-shadow: 0 8px 30px rgba(0,0,0,0.24);
+    }
+
+    .visual-author {
+        margin-top: 1rem;
+        color: rgba(255,255,255,0.75);
+        font-size: 0.95rem;
+        font-family: 'Lora', serif;
+    }
+
+    .time-card {
+        align-self: flex-end;
+        min-width: 250px;
+        padding: 1.25rem 1.35rem;
+        border-radius: 24px;
+        background: rgba(255,255,255,0.12);
+        border: 1px solid rgba(255,255,255,0.16);
+        backdrop-filter: blur(8px);
+        box-shadow: 0 18px 40px rgba(0,0,0,0.18);
+    }
+
+    .time-greeting {
+        margin-bottom: 0.25rem;
+        font-size: 0.92rem;
+        color: rgba(255,255,255,0.82);
+    }
+
+    .time-clock {
+        font-family: 'Playfair Display', serif;
+        font-size: 3rem;
+        line-height: 1;
+        color: #fff;
+        margin-bottom: 0.35rem;
+    }
+
+    .time-date,
+    .time-message {
+        color: rgba(255,255,255,0.72);
+        font-size: 0.9rem;
+    }
+
+    .birthday-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        background:
+            radial-gradient(circle at top, rgba(255,255,255,0.35), transparent 28%),
+            linear-gradient(135deg, rgba(255, 229, 236, 0.96), rgba(255, 194, 209, 0.96), rgba(255, 239, 244, 0.98));
+        backdrop-filter: blur(8px);
+    }
+
+    .birthday-card {
+        max-width: 720px;
+        border-radius: 32px;
+        background: rgba(255,255,255,0.9);
+        border: 1px solid rgba(255,255,255,0.65);
+        box-shadow: 0 30px 90px rgba(199, 95, 125, 0.24);
+        padding: 2.2rem;
+        color: #241b20;
+    }
+
+    .birthday-icon-wrapper {
+        width: 78px;
+        height: 78px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        background: linear-gradient(135deg, #fff, #ffe8ef);
+        box-shadow: 0 12px 28px rgba(199, 95, 125, 0.2);
+    }
+
+    .birthday-icon-wrapper i {
+        font-size: 2rem;
+        color: #bf476d;
+    }
+
+    .birthday-title {
+        text-align: center;
+        font-size: clamp(2rem, 4vw, 3rem);
+        margin-bottom: 0.5rem;
+    }
+
+    .birthday-subtitle {
+        text-align: center;
+        color: #7d5a68;
+        margin-bottom: 1.5rem;
+        font-size: 1.02rem;
+    }
+
+    .birthday-message {
+        background: rgba(255,245,248,0.95);
+        border: 1px solid rgba(191, 126, 149, 0.15);
+        border-radius: 22px;
+        padding: 1.35rem;
+        line-height: 1.8;
+        color: #3b2b31;
+    }
+
+    .birthday-signature {
+        margin: 1.25rem 0 1.4rem;
+        text-align: center;
+        font-family: 'Dancing Script', cursive;
+        font-size: 2rem;
+        color: #a24566;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
+    @media (max-width: 1024px) {
+        .login-stage {
+            grid-template-columns: 1fr;
+        }
+
+        .login-visual {
+            min-height: 420px;
+        }
+
+        .time-card {
+            align-self: stretch;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .login-shell {
+            padding: 0.75rem;
+        }
+
+        .login-panel,
+        .visual-content,
+        .birthday-card {
+            padding: 1.35rem;
+        }
+
+        .login-stage {
+            border-radius: 24px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% if is_birthday %}
+<div id="birthdayOverlay" class="birthday-overlay">
+    <div class="birthday-card">
+        <div class="birthday-icon-wrapper">
+            <i class="fas fa-birthday-cake"></i>
+        </div>
+        <h1 class="birthday-title">Happy Birthday, Jayti!</h1>
+        <p class="birthday-subtitle">A softer, brighter year begins here.</p>
+
+        <div class="birthday-message">
+            <p>Dear Jayti,</p>
+            <p>Through our brief conversation, I saw someone who carries herself with real strength, even while holding more than most people notice. You deserve a life that feels lighter, kinder, and more deeply your own.</p>
+            <p>Today, I’m wishing you healing from what has been heavy, clarity for what comes next, and the courage to choose what truly honors you. May this space keep supporting you with calm, structure, and warmth through the year ahead.</p>
+            <p>This website is still a gift for your journey: a place to think clearly, plan steadily, and come back to yourself.</p>
+        </div>
+
+        <p class="birthday-signature">From Vivek</p>
+
+        <div class="text-center">
+            <button onclick="dismissBirthday()" class="btn btn-primary">Enter Your Personal Space</button>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="login-shell">
+    <div class="login-stage">
+        <section class="login-panel">
+            <div class="login-brand">
+                <i class="fas fa-heart"></i>
+                Personal Companion
+            </div>
+
+            <h1 class="login-title">Jayti</h1>
+            <p class="login-copy">
+                A calmer, more intentional place for your notes, diary, goals, astrology, and now Tangred wardrobe intelligence.
+            </p>
+
+            {% if error %}
+            <div class="alert alert-danger shell-panel" role="alert">
+                {{ error }}
+            </div>
+            {% endif %}
+
+            <form method="post" action="{% url 'login' %}" class="login-form">
+                {% csrf_token %}
+
+                <div class="login-field">
+                    <label for="username">Access Code</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your access code" required>
+                </div>
+
+                <div class="login-field">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Password" required>
+                </div>
+
+                <div class="login-actions">
+                    <button type="submit" class="btn btn-primary login-btn">
+                        <i class="fas fa-sign-in-alt me-2"></i>Enter Jayti
+                    </button>
+                </div>
+            </form>
+
+            <div class="login-note">
+                <strong>Private by design:</strong> your writing, planning, and Tangred wardrobe sessions stay inside your personal application flow.
+            </div>
+
+            <div class="login-meta">
+                <span class="meta-chip">Notes, diary, goals, astrology</span>
+                <span class="meta-chip">Tangred wardrobe AI</span>
+                <span class="meta-chip">Tan Studio playground</span>
+            </div>
+        </section>
+
+        <aside class="login-visual">
+            <div class="flower-slideshow">
+                <div class="flower-slide active" style="background-image: url('https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=1200');"></div>
+                <div class="flower-slide" style="background-image: url('https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?w=1200');"></div>
+                <div class="flower-slide" style="background-image: url('https://images.unsplash.com/photo-1468327768560-75b778cbb551?w=1200');"></div>
+                <div class="flower-slide" style="background-image: url('https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=1200');"></div>
+            </div>
+            <div class="visual-overlay"></div>
+
+            <div class="visual-content">
+                <div class="visual-kicker">
+                    <i class="fas fa-sparkles"></i>
+                    Daily Thought
+                </div>
+
+                <div>
+                    <div class="visual-quote">
+                        "{{ daily_content.thought.content }}"
+                    </div>
+                    {% if daily_content.thought.author %}
+                    <div class="visual-author">— {{ daily_content.thought.author }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="time-card">
+                    <div class="time-greeting">{{ time_context.greeting }}</div>
+                    <div class="time-clock" id="clock">{{ daily_content.date|date:"H:i" }}</div>
+                    <div class="time-date">{{ daily_content.date|date:"l, F d, Y" }}</div>
+                    <div class="time-message mt-2">{{ time_context.message }}</div>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function updateClock() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const clock = document.getElementById('clock');
+        if (clock) {
+            clock.textContent = `${hours}:${minutes}`;
+        }
+    }
+
+    setInterval(updateClock, 1000);
+
+    function dismissBirthday() {
+        const overlay = document.getElementById('birthdayOverlay');
+        if (!overlay) {
+            return;
+        }
+        overlay.style.opacity = '0';
+        overlay.style.transition = 'opacity 0.45s ease';
+        setTimeout(() => {
+            overlay.classList.add('hidden');
+        }, 450);
+
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (csrfToken) {
+            fetch('/api/birthday-seen/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken.value
+                }
+            }).catch(() => {});
+        }
+    }
+
+    {% if is_birthday %}
+    setTimeout(() => {
+        const overlay = document.getElementById('birthdayOverlay');
+        if (overlay && !overlay.classList.contains('hidden')) {
+            dismissBirthday();
+        }
+    }, 60000);
+    {% endif %}
+
+    const slides = document.querySelectorAll('.flower-slide');
+    let currentSlide = 0;
+
+    function nextSlide() {
+        if (!slides.length) {
+            return;
+        }
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add('active');
+    }
+
+    setInterval(nextSlide, 8000);
+</script>
+{% endblock %}

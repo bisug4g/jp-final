@@ -1,0 +1,19 @@
+{
+  "name": "jayti-e2e-node",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Local-only Playwright harness for JAYTI (codegen / trace UI). CI uses the Python suite in tests/e2e.",
+  "scripts": {
+    "test": "playwright test",
+    "test:visual": "playwright test visual.spec.ts",
+    "test:perf": "playwright test perf.spec.ts",
+    "test:prod-smoke": "BASE_URL=https://jaytibirthday.in playwright test prod-smoke.spec.ts",
+    "codegen": "playwright codegen",
+    "report": "playwright show-report",
+    "install-browsers": "playwright install --with-deps chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.47.0",
+    "@types/node": "^20.14.10"
+  }
+}

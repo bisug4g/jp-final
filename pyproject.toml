@@ -1,0 +1,34 @@
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+extend-exclude = [
+    "migrations",
+    "staticfiles",
+    "media",
+    ".venv",
+    "venv",
+    "firebase-functions",
+    "firebase-hosting",
+    "docs",
+]
+
+[tool.ruff.lint]
+# Focus on real-bug rules only; style cleanup is intentionally out of scope
+# so CI doesn't churn thousands of legacy lines.
+select = [
+    "E9",  # syntax / runtime errors
+    "F",   # pyflakes (undefined names, unused imports that mask bugs)
+    "B",   # flake8-bugbear
+]
+ignore = [
+    "B008",  # function calls in defaults (common Django pattern)
+    "B904",  # raise ... from err (legacy code noise)
+    "B007",  # unused loop variable (common when iterating enum items for side effects)
+    "F401",  # allow unused imports (re-exports are common in Django apps)
+    "F541",  # f-string without placeholders (stylistic, not a bug)
+    "F841",  # allow unused locals (common in try/except for debugging)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/migrations/*" = ["E", "F", "B"]
+"**/settings.py" = ["E402", "F401"]

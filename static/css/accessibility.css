@@ -1,0 +1,393 @@
+/* ============================================
+   ACCESSIBILITY & RESPONSIVE FIXES
+   WCAG AA Compliant | Mobile-First
+   ============================================ */
+
+/* --------------------------------------------
+   1. WCAG AA COLOR CONTRAST FIXES
+   -------------------------------------------- */
+:root {
+  /* Updated colors for WCAG AA compliance (4.5:1 minimum) */
+  --text-primary: #1A1A1A;        /* 16.1:1 on white */
+  --text-secondary: #404040;       /* 10.4:1 on white */
+  --text-muted: #595959;           /* 7.0:1 on white */
+  --link-color: #A67B7B;           /* 3.65:1 on white — outline/UI only, not text */
+  --link-hover: #8B5A5A;           /* 5.1:1 on white — passes WCAG AA for normal text */
+  
+  /* Touch target minimum */
+  --touch-target-min: 44px;
+  
+  /* Focus indicator */
+  --focus-ring: 0 0 0 3px rgba(166, 123, 123, 0.5);
+}
+
+/* --------------------------------------------
+   2. KEYBOARD NAVIGATION & FOCUS INDICATORS
+   -------------------------------------------- */
+*:focus {
+  outline: 2px solid var(--link-color);
+  outline-offset: 2px;
+}
+
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--link-color);
+  outline-offset: 2px;
+  box-shadow: var(--focus-ring);
+}
+
+/* Skip to main content link */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  /* White on --link-hover (#8B5A5A) = ~5.1:1, passes WCAG AA for normal text.
+     The lighter --link-color (#A67B7B) is only 3.65:1 and fails AA. */
+  background: var(--link-hover);
+  color: white;
+  padding: 8px 16px;
+  text-decoration: none;
+  z-index: 10000;
+  border-radius: 0 0 4px 0;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* --------------------------------------------
+   3. TOUCH TARGETS (44x44px minimum)
+   -------------------------------------------- */
+.btn,
+.nav-link,
+button,
+a.btn,
+input[type="submit"],
+input[type="button"] {
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+  padding: 12px 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-sm {
+  min-height: 36px;
+  padding: 8px 16px;
+}
+
+/* Icon-only buttons */
+.btn-icon {
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  padding: 0;
+}
+
+/* --------------------------------------------
+   4. RESPONSIVE BREAKPOINTS (Mobile-First)
+   -------------------------------------------- */
+
+/* Small mobile (375px) */
+@media (max-width: 375px) {
+  body {
+    font-size: 14px;
+  }
+  
+  .container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  
+  h1 {
+    font-size: 1.75rem;
+  }
+  
+  .card-body {
+    padding: 12px;
+  }
+}
+
+/* Mobile (576px) */
+@media (min-width: 576px) {
+  .container {
+    max-width: 540px;
+  }
+}
+
+/* Tablet (768px) */
+@media (min-width: 768px) {
+  .container {
+    max-width: 720px;
+  }
+}
+
+/* Tablet landscape (1024px) */
+@media (min-width: 1024px) {
+  .container {
+    max-width: 960px;
+  }
+  
+  .chart-container {
+    min-height: 350px;
+  }
+}
+
+/* Desktop (1280px) */
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1140px;
+  }
+}
+
+/* Large desktop (1440px+) */
+@media (min-width: 1440px) {
+  .container {
+    max-width: 1320px;
+  }
+}
+
+/* --------------------------------------------
+   5. LOADING STATES
+   -------------------------------------------- */
+.loading-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.spinner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+/* --------------------------------------------
+   6. EMPTY STATES
+   -------------------------------------------- */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-muted);
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.empty-state-text {
+  font-size: 0.95rem;
+  margin-bottom: 24px;
+}
+
+/* --------------------------------------------
+   7. CONFIRMATION DIALOGS
+   -------------------------------------------- */
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.modal-content {
+  border-radius: 12px;
+  border: none;
+}
+
+.modal-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 20px 24px;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-footer {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 16px 24px;
+}
+
+/* --------------------------------------------
+   8. ERROR HANDLING
+   -------------------------------------------- */
+.alert {
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  border-left: 4px solid;
+}
+
+.alert-danger {
+  background: #FEE;
+  border-left-color: #DC3545;
+  color: #721C24;
+}
+
+.alert-success {
+  background: #EFE;
+  border-left-color: #28A745;
+  color: #155724;
+}
+
+.alert-warning {
+  background: #FFF3CD;
+  border-left-color: #FFC107;
+  color: #856404;
+}
+
+.alert-info {
+  background: #E7F3FF;
+  border-left-color: #17A2B8;
+  color: #0C5460;
+}
+
+/* Form validation */
+.form-control.is-invalid {
+  border-color: #DC3545;
+  padding-right: calc(1.5em + 0.75rem);
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right calc(0.375em + 0.1875rem) center;
+  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.invalid-feedback {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: #DC3545;
+}
+
+/* --------------------------------------------
+   9. RESPONSIVE IMAGES
+   -------------------------------------------- */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* --------------------------------------------
+   10. PRINT STYLES
+   -------------------------------------------- */
+@media print {
+  .navbar,
+  .dark-mode-toggle,
+  .btn,
+  .footer-custom {
+    display: none !important;
+  }
+  
+  body {
+    background: white;
+    color: black;
+  }
+  
+  .card {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+}
+
+/* --------------------------------------------
+   11. REDUCED MOTION
+   -------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* --------------------------------------------
+   12. HIGH CONTRAST MODE
+   -------------------------------------------- */
+@media (prefers-contrast: high) {
+  :root {
+    --text-primary: #000;
+    --text-secondary: #000;
+    --link-color: #0000EE;
+  }
+  
+  .btn {
+    border: 2px solid currentColor;
+  }
+}
+
+/* --------------------------------------------
+   13. DARK MODE IMPROVEMENTS
+   -------------------------------------------- */
+body.dark-mode {
+  --text-primary: #E8E8E8;
+  --text-secondary: #C0C0C0;
+  --text-muted: #A0A0A0;
+  --link-color: #D4A5A5;
+  --link-hover: #E8B4B8;
+}
+
+body.dark-mode .form-control {
+  background-color: #2A2A2A;
+  border-color: #404040;
+  color: var(--text-primary);
+}
+
+body.dark-mode .form-control:focus {
+  background-color: #2A2A2A;
+  border-color: var(--link-color);
+  color: var(--text-primary);
+}
+
+/* --------------------------------------------
+   14. UTILITY CLASSES
+   -------------------------------------------- */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}

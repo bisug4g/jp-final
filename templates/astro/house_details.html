@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}12 Houses - JaytiPargal.in{% endblock %}
+
+{% block content %}
+<div class="page-shell page-shell-wide">
+    <div class="page-hero">
+        <div class="page-hero-copy">
+            <h1>12 Houses Analysis</h1>
+            <p>A fuller breakdown of each house, its sign, its lord, and the planets currently shaping it.</p>
+        </div>
+        <div class="page-actions">
+            <a href="{% url 'astro_dashboard' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Astro
+            </a>
+        </div>
+    </div>
+
+    <div class="shell-grid shell-grid-3">
+        {% for house in houses %}
+        <div class="shell-card">
+            <div class="shell-card-header">
+                <div class="section-heading mb-0">
+                    <h4>House {{ house.number }}</h4>
+                    <span class="chip {% if house.score >= 25 %}chip-success{% elif house.score >= 18 %}chip-warning{% else %}chip-soft{% endif %}">Score {{ house.score }}</span>
+                </div>
+            </div>
+            <div class="shell-card-body">
+                <p class="text-muted">{{ house.meaning }}</p>
+                <div class="meta-list">
+                    <div class="meta-row">
+                        <div class="meta-label">Rashi</div>
+                        <div class="meta-value">{{ house.rashi_info.symbol }} {{ house.rashi|title }}</div>
+                    </div>
+                    <div class="meta-row">
+                        <div class="meta-label">Lord</div>
+                        <div class="meta-value">{{ house.lord_info.symbol }} {{ house.lord|title }}</div>
+                    </div>
+                    <div class="meta-row">
+                        <div class="meta-label">Strength</div>
+                        <div class="meta-value">{{ house.strength }}</div>
+                    </div>
+                </div>
+
+                <div class="chip-row mt-3">
+                    {% for planet in house.planets %}
+                    <a href="{% url 'planet_detail' planet.name %}" class="pill-link chip">{{ planet.symbol }} {{ planet.name|title }}</a>
+                    {% empty %}
+                    <span class="chip chip-soft">No planets here</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

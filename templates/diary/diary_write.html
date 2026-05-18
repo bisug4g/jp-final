@@ -1,0 +1,674 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Write Diary - {{ entry.entry_date|date:"F d, Y" }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/custom.css' %}">
+<style>
+    .diary-editor {
+        min-height: 320px;
+        background: white;
+        border: 1px solid rgba(232,180,184,0.4);
+        border-radius: 12px;
+        padding: 1.25rem;
+        font-family: 'Lato', sans-serif;
+        line-height: 1.7;
+        resize: vertical;
+        font-size: 0.95rem;
+    }
+    
+    .diary-editor:focus {
+        outline: none;
+        border-color: var(--blush-rose);
+        box-shadow: 0 0 0 0.2rem rgba(232,180,184,0.2);
+    }
+    
+    .input-method-btn {
+        border: 1px solid rgba(232,180,184,0.4);
+        background: white;
+        color: var(--muted-mauve);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        transition: all 0.2s ease;
+        margin: 0 0.2rem;
+        font-size: 0.85rem;
+    }
+    
+    .input-method-btn:hover,
+    .input-method-btn.active {
+        background: linear-gradient(135deg, var(--blush-rose), var(--dusty-rose));
+        color: white;
+        border-color: transparent;
+    }
+    
+    .voice-btn {
+        background: linear-gradient(135deg, #e57373, #ef5350);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 25px;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+    }
+    
+    .voice-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(229, 115, 115, 0.3);
+    }
+    
+    .voice-btn.recording {
+        animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.03); }
+    }
+    
+    /* Text-based Mood Selector (No Emojis) */
+    .mood-selector-text {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .mood-option-text {
+        cursor: pointer;
+        padding: 0.4rem 0.875rem;
+        border-radius: 16px;
+        border: 1px solid transparent;
+        transition: all 0.2s ease;
+        font-size: 0.8rem;
+        color: var(--muted-mauve);
+        background: rgba(232,180,184,0.1);
+    }
+    
+    .mood-option-text:hover,
+    .mood-option-text.selected {
+        border-color: var(--blush-rose);
+        background: rgba(232,180,184,0.2);
+        color: var(--warm-charcoal);
+    }
+    
+    /* Mood Color Indicators */
+    .mood-struggling.selected { border-left: 3px solid #dc3545; background: rgba(220, 53, 69, 0.1); }
+    .mood-difficult.selected { border-left: 3px solid #fd7e14; background: rgba(253, 126, 20, 0.1); }
+    .mood-neutral.selected { border-left: 3px solid #6c757d; background: rgba(108, 117, 125, 0.1); }
+    .mood-good.selected { border-left: 3px solid #28a745; background: rgba(40, 167, 69, 0.1); }
+    .mood-great.selected { border-left: 3px solid #20c997; background: rgba(32, 201, 151, 0.1); }
+    
+    .handwriting-canvas {
+        border: 1px dashed rgba(232,180,184,0.5);
+        border-radius: 12px;
+        background: white;
+        cursor: crosshair;
+    }
+    
+    .prompt-card {
+        background: linear-gradient(135deg, rgba(232,180,184,0.08), rgba(230,230,250,0.08));
+        border-left: 3px solid var(--blush-rose);
+        padding: 0.875rem 1.25rem;
+        border-radius: 0 10px 10px 0;
+        margin-bottom: 1rem;
+    }
+    
+    .voice-transcript {
+        background: rgba(232,180,184,0.08);
+        border-radius: 10px;
+        padding: 0.875rem;
+        margin-top: 0.75rem;
+        font-style: italic;
+        color: var(--muted-mauve);
+        font-size: 0.9rem;
+    }
+    
+    .recording-indicator {
+        display: none;
+        align-items: center;
+        gap: 0.5rem;
+        color: #ef5350;
+        font-weight: 500;
+        margin-top: 0.75rem;
+        font-size: 0.85rem;
+    }
+    
+    .recording-indicator.active {
+        display: flex;
+    }
+    
+    .recording-dot {
+        width: 10px;
+        height: 10px;
+        background: #ef5350;
+        border-radius: 50%;
+        animation: blink 1s infinite;
+    }
+    
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+    }
+    
+    /* Offline Status Indicator */
+    .sync-status {
+        position: fixed;
+        bottom: 1rem;
+        right: 1rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        z-index: 1000;
+        transition: all 0.3s ease;
+    }
+    
+    .sync-status.online {
+        background: #28a745;
+        color: white;
+    }
+    
+    .sync-status.offline {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .sync-status.syncing {
+        background: #ffc107;
+        color: #333;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-3">
+                <h1 class="h4 mb-1">{{ entry.entry_date|date:"F d, Y" }}</h1>
+                <p class="text-mauve" style="font-size: 0.85rem;">
+                    <i class="fas fa-lock me-1"></i>Private & Secure
+                </p>
+            </div>
+            
+            <!-- Daily Prompt -->
+            {% if daily_prompt %}
+            <div class="prompt-card">
+                <small class="text-mauve d-block mb-1" style="font-size: 0.75rem;">
+                    <i class="fas fa-lightbulb me-1 text-blush"></i>Today's Reflection Prompt
+                </small>
+                <p class="mb-0" style="font-size: 0.95rem;">{{ daily_prompt.question }}</p>
+            </div>
+            {% endif %}
+            
+            <!-- Input Method Selector -->
+            <div class="text-center mb-3">
+                <button type="button" class="input-method-btn active" onclick="setInputMethod('type')">
+                    <i class="fas fa-keyboard me-1"></i>Type
+                </button>
+                <button type="button" class="input-method-btn" onclick="setInputMethod('voice')">
+                    <i class="fas fa-microphone me-1"></i>Speak
+                </button>
+                <button type="button" class="input-method-btn" onclick="setInputMethod('stylus')">
+                    <i class="fas fa-pen me-1"></i>Write
+                </button>
+            </div>
+            
+            <form method="post" id="diaryForm">
+                {% csrf_token %}
+                <input type="hidden" name="input_method" id="inputMethod" value="type">
+                <input type="hidden" name="mood" id="selectedMood" value="">
+                {% if daily_prompt %}
+                <input type="hidden" name="prompt_used" value="{{ daily_prompt.question }}">
+                {% endif %}
+                
+                <!-- Typing Input -->
+                <div id="typeInput" class="input-section">
+                    <textarea 
+                        name="content" 
+                        id="diaryContent"
+                        class="diary-editor w-100" 
+                        placeholder="Dear Diary...&#10;&#10;How are you feeling today? What's on your mind? Take this time to be honest with yourself."
+                    >{{ entry.content }}</textarea>
+                </div>
+                
+                <!-- Voice Input -->
+                <div id="voiceInput" class="input-section" style="display: none;">
+                    <div class="text-center py-4">
+                        <p class="text-mauve mb-3" style="font-size: 0.9rem;">Click the microphone and speak your thoughts...</p>
+                        <button type="button" class="voice-btn" id="voiceBtn" onclick="toggleVoiceRecording()">
+                            <i class="fas fa-microphone me-1"></i>
+                            <span id="voiceBtnText">Start Speaking</span>
+                        </button>
+                        
+                        <div class="recording-indicator" id="recordingIndicator">
+                            <span class="recording-dot"></span>
+                            <span>Recording... Click to stop</span>
+                        </div>
+                        
+                        <div class="voice-transcript" id="voiceTranscript" style="display: none;">
+                            <strong>Transcript:</strong>
+                            <p class="mb-0 mt-1" id="transcriptText"></p>
+                        </div>
+                        
+                        <input type="hidden" name="voice_transcript" id="voiceTranscriptInput" value="">
+                        <input type="hidden" name="voice_duration" id="voiceDuration" value="0">
+                    </div>
+                </div>
+                
+                <!-- Handwriting Input -->
+                <div id="stylusInput" class="input-section" style="display: none;">
+                    <div class="text-center mb-2">
+                        <p class="text-mauve" style="font-size: 0.85rem;">Use your stylus or finger to write</p>
+                        <div class="btn-group mb-2">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="clearCanvas()">
+                                <i class="fas fa-eraser me-1"></i>Clear
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="undoStroke()">
+                                <i class="fas fa-undo me-1"></i>Undo
+                            </button>
+                        </div>
+                    </div>
+                    <canvas id="handwritingCanvas" class="handwriting-canvas w-100" height="320"></canvas>
+                    <input type="hidden" name="handwriting_strokes" id="handwritingStrokes" value="[]">
+                    <input type="hidden" name="handwriting_ocr_text" id="handwritingOcrText" value="">
+                    <p class="text-muted small text-center mt-2" style="font-size: 0.75rem;">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Your handwriting is saved as an image.
+                    </p>
+                </div>
+                
+                <!-- Mood Tracking - Text Based (No Emojis) -->
+                <div class="mt-3 mb-3">
+                    <label class="d-block text-center mb-2" style="font-size: 0.9rem;">
+                        <i class="fas fa-heart text-blush me-1"></i>How are you feeling today?
+                    </label>
+                    <div class="mood-selector-text">
+                        <span class="mood-option-text mood-struggling" data-mood="1" onclick="selectMood(1)">Struggling</span>
+                        <span class="mood-option-text mood-difficult" data-mood="2" onclick="selectMood(2)">Difficult</span>
+                        <span class="mood-option-text mood-neutral" data-mood="3" onclick="selectMood(3)">Neutral</span>
+                        <span class="mood-option-text mood-good" data-mood="4" onclick="selectMood(4)">Good</span>
+                        <span class="mood-option-text mood-great" data-mood="5" onclick="selectMood(5)">Great</span>
+                    </div>
+                    <input type="text" name="mood_note" class="form-control mt-2" style="font-size: 0.9rem;" placeholder="Add a note about your mood (optional)" value="{{ entry.mood_note }}">
+                </div>
+                
+                <!-- Submit Buttons -->
+                <div class="d-flex gap-2 justify-content-center mt-3">
+                    <a href="{% url 'diary_overview' %}" class="btn btn-outline-secondary px-3" style="font-size: 0.9rem;">
+                        <i class="fas fa-times me-1"></i>Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary px-4" id="saveBtn" style="font-size: 0.9rem;">
+                        <i class="fas fa-save me-1"></i>Save Entry
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Offline Sync Status Indicator -->
+<div id="syncStatus" class="sync-status online" style="display: none;">
+    <i class="fas fa-check-circle me-1"></i>Online
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // ==========================================
+    // OFFLINE MODE & LOCAL STORAGE SYNC
+    // ==========================================
+    
+    const ENTRY_ID = '{{ entry.id|default:"new" }}';
+    const STORAGE_KEY = `diary_entry_${ENTRY_ID}`;
+    let isOnline = navigator.onLine;
+    let syncStatusEl = document.getElementById('syncStatus');
+    
+    // Update online status
+    function updateOnlineStatus() {
+        isOnline = navigator.onLine;
+        if (syncStatusEl) {
+            syncStatusEl.style.display = 'block';
+            if (isOnline) {
+                syncStatusEl.className = 'sync-status online';
+                syncStatusEl.innerHTML = '<i class="fas fa-check-circle me-1"></i>Online';
+                // Try to sync any pending entries
+                syncPendingEntries();
+            } else {
+                syncStatusEl.className = 'sync-status offline';
+                syncStatusEl.innerHTML = '<i class="fas fa-wifi me-1"></i>Offline - Saved to Device';
+            }
+        }
+    }
+    
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    
+    // Auto-save to localStorage every 5 seconds
+    function autoSaveToLocal() {
+        const content = document.getElementById('diaryContent')?.value || '';
+        const mood = document.getElementById('selectedMood')?.value || '';
+        const moodNote = document.querySelector('input[name="mood_note"]')?.value || '';
+        
+        const entryData = {
+            content: content,
+            mood: mood,
+            mood_note: moodNote,
+            timestamp: new Date().toISOString(),
+            sync_needed: !isOnline && (content.length > 0)
+        };
+        
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(entryData));
+        console.log('[Diary] Auto-saved to localStorage');
+    }
+    
+    // Auto-save every 5 seconds
+    setInterval(autoSaveToLocal, 5000);
+    
+    // Load from localStorage on page load
+    function loadFromLocal() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            const data = JSON.parse(saved);
+            if (data.content && !document.getElementById('diaryContent')?.value) {
+                document.getElementById('diaryContent').value = data.content;
+            }
+            if (data.mood) {
+                selectMood(data.mood);
+            }
+            if (data.mood_note) {
+                document.querySelector('input[name="mood_note"]').value = data.mood_note;
+            }
+            console.log('[Diary] Loaded from localStorage');
+        }
+    }
+    
+    // Handle form submission with offline support
+    document.getElementById('diaryForm').addEventListener('submit', function(e) {
+        if (!isOnline) {
+            e.preventDefault();
+            autoSaveToLocal();
+            
+            // Show offline saved message
+            const btn = document.getElementById('saveBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check me-1"></i>Saved to Device (Offline)';
+            btn.classList.remove('btn-primary');
+            btn.classList.add('btn-success');
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-primary');
+            }, 3000);
+            
+            // Mark for sync
+            const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+            data.sync_needed = true;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            
+            return false;
+        }
+        
+        // Online - clear localStorage after successful save
+        localStorage.removeItem(STORAGE_KEY);
+    });
+    
+    // Sync pending entries when back online
+    function syncPendingEntries() {
+        const pendingKeys = Object.keys(localStorage).filter(key => 
+            key.startsWith('diary_entry_') && key !== STORAGE_KEY
+        );
+        
+        pendingKeys.forEach(key => {
+            const data = JSON.parse(localStorage.getItem(key));
+            if (data && data.sync_needed) {
+                console.log('[Diary] Syncing pending entry:', key);
+                // In a real implementation, you would send this to the server
+                // For now, we just mark it as synced
+                data.sync_needed = false;
+                localStorage.setItem(key, JSON.stringify(data));
+            }
+        });
+    }
+    
+    // Load saved data on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadFromLocal();
+        updateOnlineStatus();
+    });
+    
+    // ==========================================
+    // INPUT METHOD SWITCHING
+    // ==========================================
+    
+    function setInputMethod(method) {
+        document.querySelectorAll('.input-method-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.closest('.input-method-btn').classList.add('active');
+        
+        document.getElementById('inputMethod').value = method;
+        
+        document.querySelectorAll('.input-section').forEach(section => section.style.display = 'none');
+        document.getElementById(method + 'Input').style.display = 'block';
+    }
+    
+    // ==========================================
+    // MOOD SELECTION (Text-based)
+    // ==========================================
+    
+    function selectMood(mood) {
+        document.getElementById('selectedMood').value = mood;
+        document.querySelectorAll('.mood-option-text').forEach(option => option.classList.remove('selected'));
+        document.querySelector(`[data-mood="${mood}"]`).classList.add('selected');
+    }
+    
+    // ==========================================
+    // VOICE RECORDING
+    // ==========================================
+    
+    let recognition = null;
+    let recordingStartTime = null;
+    let isRecording = false;
+    
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'en-IN';
+        
+        recognition.onresult = function(event) {
+            let finalTranscript = '';
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                if (event.results[i].isFinal) {
+                    finalTranscript += event.results[i][0].transcript;
+                }
+            }
+            
+            if (finalTranscript) {
+                document.getElementById('transcriptText').textContent = finalTranscript;
+                document.getElementById('voiceTranscriptInput').value = finalTranscript;
+                document.getElementById('voiceTranscript').style.display = 'block';
+            }
+        };
+        
+        recognition.onerror = function(event) {
+            console.error('Speech recognition error:', event.error);
+            stopRecording();
+            alert('Voice recording error: ' + event.error + '. Please try again or use typing.');
+        };
+    }
+    
+    function toggleVoiceRecording() {
+        if (!recognition) {
+            alert('Voice recording is not supported in your browser. Please use Chrome or Edge.');
+            return;
+        }
+        
+        if (isRecording) {
+            stopRecording();
+        } else {
+            startRecording();
+        }
+    }
+    
+    function startRecording() {
+        isRecording = true;
+        recordingStartTime = Date.now();
+        
+        document.getElementById('voiceBtn').classList.add('recording');
+        document.getElementById('voiceBtnText').textContent = 'Stop Recording';
+        document.getElementById('recordingIndicator').classList.add('active');
+        
+        recognition.start();
+    }
+    
+    function stopRecording() {
+        isRecording = false;
+        
+        const duration = Math.round((Date.now() - recordingStartTime) / 1000);
+        document.getElementById('voiceDuration').value = duration;
+        
+        document.getElementById('voiceBtn').classList.remove('recording');
+        document.getElementById('voiceBtnText').textContent = 'Start Speaking';
+        document.getElementById('recordingIndicator').classList.remove('active');
+        
+        if (recognition) {
+            recognition.stop();
+        }
+    }
+    
+    // ==========================================
+    // HANDWRITING CANVAS
+    // ==========================================
+    
+    let canvas, ctx;
+    let isDrawing = false;
+    let strokes = [];
+    let currentStroke = [];
+    
+    function initCanvas() {
+        canvas = document.getElementById('handwritingCanvas');
+        if (!canvas) return;
+        
+        ctx = canvas.getContext('2d');
+        ctx.strokeStyle = '#4A4A4A';
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        
+        // Mouse events
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+        
+        // Touch events
+        canvas.addEventListener('touchstart', handleTouch);
+        canvas.addEventListener('touchmove', handleTouch);
+        canvas.addEventListener('touchend', stopDrawing);
+    }
+    
+    function startDrawing(e) {
+        isDrawing = true;
+        currentStroke = [];
+        const pos = getPos(e);
+        currentStroke.push(pos);
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+    }
+    
+    function draw(e) {
+        if (!isDrawing) return;
+        const pos = getPos(e);
+        currentStroke.push(pos);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+    }
+    
+    function stopDrawing() {
+        if (!isDrawing) return;
+        isDrawing = false;
+        if (currentStroke.length > 0) {
+            strokes.push([...currentStroke]);
+            updateStrokesInput();
+        }
+    }
+    
+    function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        
+        return {
+            x: (e.clientX - rect.left) * scaleX,
+            y: (e.clientY - rect.top) * scaleY
+        };
+    }
+    
+    function handleTouch(e) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' : 'mousemove', {
+            clientX: touch.clientX,
+            clientY: touch.clientY
+        });
+        canvas.dispatchEvent(mouseEvent);
+    }
+    
+    function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        strokes = [];
+        updateStrokesInput();
+    }
+    
+    function undoStroke() {
+        if (strokes.length === 0) return;
+        strokes.pop();
+        redrawCanvas();
+        updateStrokesInput();
+    }
+    
+    function redrawCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        strokes.forEach(stroke => {
+            if (stroke.length === 0) return;
+            ctx.beginPath();
+            ctx.moveTo(stroke[0].x, stroke[0].y);
+            for (let i = 1; i < stroke.length; i++) {
+                ctx.lineTo(stroke[i].x, stroke[i].y);
+            }
+            ctx.stroke();
+        });
+    }
+    
+    function updateStrokesInput() {
+        document.getElementById('handwritingStrokes').value = JSON.stringify(strokes);
+    }
+    
+    // Initialize canvas when stylus tab is selected
+    document.querySelector('[onclick="setInputMethod(\'stylus\')"]')?.addEventListener('click', function() {
+        setTimeout(initCanvas, 100);
+    });
+    
+    // Set initial mood if exists
+    {% if entry.mood %}
+    selectMood({{ entry.mood }});
+    {% endif %}
+    
+    // ==========================================
+    // SERVICE WORKER REGISTRATION (PWA)
+    // ==========================================
+    
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/static/js/sw.js')
+            .then(function(registration) {
+                console.log('[PWA] Service Worker registered:', registration);
+            })
+            .catch(function(error) {
+                console.log('[PWA] Service Worker registration failed:', error);
+            });
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Tan Studio{% endblock %}
+
+{% block content %}
+<div class="page-shell page-shell-wide">
+    <div class="page-breadcrumbs">
+        <a href="{% url 'tangred_home' %}">Tangred</a>
+        <span>/</span>
+        <span class="current">Tan Studio</span>
+    </div>
+
+    <div class="page-hero">
+        <div class="page-hero-copy">
+            <h1>Tan Studio</h1>
+            <p>Turn prompts into polished product screens through Stitch MCP, with OpenRouter refining each brief before generation and Jayti keeping your project history organized.</p>
+        </div>
+        <div class="page-actions">
+            <a href="{% url 'tangred_home' %}" class="btn btn-outline-secondary">Back To Tangred</a>
+        </div>
+    </div>
+
+    <div class="shell-grid shell-grid-3 mb-4">
+        <div class="shell-stat">
+            <div class="shell-stat-top"><span>Projects</span><i class="fas fa-folder-tree"></i></div>
+            <div class="shell-stat-value">{{ stats.project_count }}</div>
+            <div class="shell-stat-note">Local Tan Studio projects synced to Stitch.</div>
+        </div>
+        <div class="shell-stat">
+            <div class="shell-stat-top"><span>Generated Screens</span><i class="fas fa-object-group"></i></div>
+            <div class="shell-stat-value">{{ stats.screen_count }}</div>
+            <div class="shell-stat-note">Screens captured in this workspace.</div>
+        </div>
+        <div class="shell-stat">
+            <div class="shell-stat-top"><span>AI Stack</span><i class="fas fa-plug"></i></div>
+            <div class="shell-stat-value">{% if stitch_ready and prompt_ai_ready %}Live{% elif stitch_ready or prompt_ai_ready %}Partial{% else %}Off{% endif %}</div>
+            <div class="shell-stat-note">{% if stitch_ready and prompt_ai_ready %}Stitch + OpenRouter prompt optimization are ready.{% elif stitch_ready %}Stitch is live but OpenRouter prompt optimization is unavailable.{% else %}Configure Stitch and OpenRouter to enable Tan Studio generation.{% endif %}</div>
+        </div>
+    </div>
+
+    <div class="shell-sidebar-layout">
+        <div class="shell-grid">
+            <div class="shell-card">
+                <div class="shell-card-header">
+                    <div class="section-heading mb-0">
+                        <h4>Your Projects</h4>
+                        <span class="chip">{{ projects|length }} total</span>
+                    </div>
+                </div>
+                <div class="shell-card-body">
+                    {% if projects %}
+                    <div class="list-stack">
+                        {% for project in projects %}
+                        <div class="list-row">
+                            <div>
+                                <a href="{% url 'tan_studio_project_detail' project.pk %}">{{ project.title }}</a>
+                                <div class="text-muted small mt-1">
+                                    Stitch ID {{ project.stitch_project_id }} · {{ project.screens.count }} screen{{ project.screens.count|pluralize }}
+                                </div>
+                            </div>
+                            <div class="chip-row">
+                                {% if project.latest_screen %}
+                                <span class="chip chip-soft">{{ project.latest_screen.device_type }}</span>
+                                {% endif %}
+                                <a href="{% url 'tan_studio_project_detail' project.pk %}" class="btn btn-sm btn-outline-secondary">Open</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-shell">
+                        <h4>No Tan Studio projects yet</h4>
+                        <p class="text-muted">Create one on the right and Stitch will start generating screens for it.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="shell-grid">
+            <div class="shell-card">
+                <div class="shell-card-header">
+                    <div class="section-heading mb-0">
+                        <h4>Create Project</h4>
+                    </div>
+                </div>
+                <div class="shell-card-body">
+                    <form method="post" action="{% url 'tan_studio_create_project' %}" class="shell-form">
+                        {% csrf_token %}
+                        <div>
+                            <label class="form-label">Project Title</label>
+                            <input type="text" name="title" class="form-control" placeholder="Tan Studio App Redesign" required>
+                        </div>
+                        <div>
+                            <label class="form-label">Local Notes</label>
+                            <textarea name="description" class="form-control" rows="4" placeholder="What this project is for, who it serves, or what aesthetic direction you want."></textarea>
+                        </div>
+                        <div class="shell-actions">
+                            <button type="submit" class="btn btn-primary" {% if not stitch_ready %}disabled{% endif %}>
+                                <i class="fas fa-plus me-2"></i>Create in Stitch
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="surface-note">
+                <strong>How Tan Studio works:</strong> it creates a Stitch project, rewrites your idea into a stronger screen brief with OpenRouter, sends that optimized prompt through MCP, and stores the resulting screen assets locally so you can revisit them later.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

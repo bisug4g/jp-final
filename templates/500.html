@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Something went wrong · jayti</title>
+  <style>
+    :root { --pink-accent: #FB6F92; --text-dark: #333; --text-muted: #666; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #FFE5EC; color: var(--text-dark);
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      padding: 2rem;
+    }
+    .card {
+      background: #fff; border-radius: 12px; padding: 3rem 2.5rem; max-width: 520px;
+      width: 100%; text-align: center; box-shadow: 0 10px 30px rgba(251,111,146,.15);
+    }
+    h1 { margin: 0 0 .75rem; font-size: 2rem; color: var(--pink-accent); }
+    p { color: var(--text-muted); line-height: 1.55; margin: 0 0 1.5rem; }
+    a.btn {
+      display: inline-block; background: var(--pink-accent); color: #fff;
+      padding: .65rem 1.4rem; border-radius: 999px; text-decoration: none; font-weight: 600;
+    }
+    a.btn:hover { filter: brightness(.95); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Something went wrong</h1>
+    <p>We hit an unexpected error on our end. The team has been notified — please try again in a moment.</p>
+    <a class="btn" href="/">Back to home</a>
+  </div>
+</body>
+</html>

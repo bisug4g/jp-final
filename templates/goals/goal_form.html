@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if goal %}Edit Goal{% else %}Create New Goal{% endif %} - JaytiPargal.in{% endblock %}
+
+{% block content %}
+<div class="page-shell" style="max-width: 980px;">
+    <div class="page-breadcrumbs">
+        <a href="{% url 'goal_list' %}">Goals</a>
+        <span>/</span>
+        <span class="current">{% if goal %}Edit Goal{% else %}New Goal{% endif %}</span>
+    </div>
+
+    <div class="page-hero">
+        <div class="page-hero-copy">
+            <h1>{% if goal %}Edit Goal{% else %}Create a Goal{% endif %}</h1>
+            <p>Define the role, timeline, and outcome clearly so the generated action plan can be much sharper.</p>
+        </div>
+    </div>
+
+    <div class="shell-card">
+        <div class="shell-card-body">
+            <form method="post" class="shell-form">
+                {% csrf_token %}
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Marketing Role</label>
+                        <select class="form-select" name="role_category" required>
+                            <option value="">Select role</option>
+                            <option value="digital_marketing" {% if goal and goal.role_category == 'digital_marketing' %}selected{% endif %}>Digital Marketing</option>
+                            <option value="brand_management" {% if goal and goal.role_category == 'brand_management' %}selected{% endif %}>Brand Management</option>
+                            <option value="content_strategy" {% if goal and goal.role_category == 'content_strategy' %}selected{% endif %}>Content Strategy</option>
+                            <option value="market_research" {% if goal and goal.role_category == 'market_research' %}selected{% endif %}>Market Research</option>
+                            <option value="product_marketing" {% if goal and goal.role_category == 'product_marketing' %}selected{% endif %}>Product Marketing</option>
+                            <option value="social_media" {% if goal and goal.role_category == 'social_media' %}selected{% endif %}>Social Media</option>
+                            <option value="seo_sem" {% if goal and goal.role_category == 'seo_sem' %}selected{% endif %}>SEO/SEM</option>
+                            <option value="marketing_analytics" {% if goal and goal.role_category == 'marketing_analytics' %}selected{% endif %}>Marketing Analytics</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Experience Level</label>
+                        <select class="form-select" name="experience_level" required>
+                            <option value="">Select level</option>
+                            <option value="entry" {% if goal and goal.experience_level == 'entry' %}selected{% endif %}>Entry Level</option>
+                            <option value="mid" {% if goal and goal.experience_level == 'mid' %}selected{% endif %}>Mid Level</option>
+                            <option value="senior" {% if goal and goal.experience_level == 'senior' %}selected{% endif %}>Senior Level</option>
+                            <option value="leadership" {% if goal and goal.experience_level == 'leadership' %}selected{% endif %}>Leadership</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Time Horizon</label>
+                        <select class="form-select" name="time_horizon" required>
+                            <option value="">Select timeline</option>
+                            <option value="1year" {% if goal and goal.time_horizon == '1year' %}selected{% endif %}>1 Year</option>
+                            <option value="3year" {% if goal and goal.time_horizon == '3year' %}selected{% endif %}>3 Years</option>
+                            <option value="5year" {% if goal and goal.time_horizon == '5year' %}selected{% endif %}>5 Years</option>
+                            <option value="10year" {% if goal and goal.time_horizon == '10year' %}selected{% endif %}>10 Years</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Target Date</label>
+                        <input type="date" class="form-control" name="target_date" value="{% if goal %}{{ goal.target_date|date:'Y-m-d' }}{% endif %}" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="form-label">Goal Title</label>
+                    <input type="text" class="form-control" name="title" value="{% if goal %}{{ goal.title }}{% endif %}" placeholder="Become Senior Marketing Manager" required>
+                </div>
+
+                <div>
+                    <label class="form-label">Description</label>
+                    <textarea class="form-control" name="description" rows="5" placeholder="Describe the role, shift, or achievement you are targeting.">{% if goal %}{{ goal.description }}{% endif %}</textarea>
+                </div>
+
+                {% if goal %}
+                <div>
+                    <label class="form-label">Status</label>
+                    <select class="form-select" name="status">
+                        <option value="active" {% if goal.status == 'active' %}selected{% endif %}>Active</option>
+                        <option value="paused" {% if goal.status == 'paused' %}selected{% endif %}>Paused</option>
+                        <option value="completed" {% if goal.status == 'completed' %}selected{% endif %}>Completed</option>
+                        <option value="archived" {% if goal.status == 'archived' %}selected{% endif %}>Archived</option>
+                    </select>
+                </div>
+                {% endif %}
+
+                <div class="surface-note">
+                    <strong>AI task generation:</strong> saving this goal will generate or refresh a practical plan across strategy, finance, HR, operations, and sales.
+                </div>
+
+                <div class="shell-actions">
+                    <a href="{% url 'goal_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">{% if goal %}Update Goal{% else %}Create Goal{% endif %}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

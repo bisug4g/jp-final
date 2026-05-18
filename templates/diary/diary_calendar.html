@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Diary Calendar - JaytiPargal.in{% endblock %}
+
+{% block content %}
+<div class="page-shell page-shell-wide">
+    <div class="page-hero">
+        <div class="page-hero-copy">
+            <h1>Diary Calendar</h1>
+            <p>Scan the month, revisit finished entries, and see exactly which day is still open for writing.</p>
+        </div>
+        <div class="page-actions">
+            <a href="{% url 'diary_overview' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Diary
+            </a>
+        </div>
+    </div>
+
+    <div class="shell-card">
+        <div class="shell-card-header">
+            <div class="section-heading mb-0">
+                <h4>{{ month_name }} {{ year }}</h4>
+                <div class="page-actions">
+                    <a href="?year={{ prev_year }}&month={{ prev_month }}" class="btn btn-outline-secondary btn-sm">Previous</a>
+                    <a href="?year={{ next_year }}&month={{ next_month }}" class="btn btn-outline-secondary btn-sm">Next</a>
+                </div>
+            </div>
+        </div>
+        <div class="shell-card-body">
+            <div class="calendar-shell mb-3">
+                <div class="calendar-day-name">Sun</div>
+                <div class="calendar-day-name">Mon</div>
+                <div class="calendar-day-name">Tue</div>
+                <div class="calendar-day-name">Wed</div>
+                <div class="calendar-day-name">Thu</div>
+                <div class="calendar-day-name">Fri</div>
+                <div class="calendar-day-name">Sat</div>
+
+                {% for week in calendar_weeks %}
+                    {% for day_cell in week %}
+                    <div class="calendar-cell {% if day_cell.in_month %}current-month{% else %}outside-month{% endif %} {% if day_cell.date == today %}today{% endif %}">
+                        {% if day_cell.date %}
+                            {% if day_cell.entry %}
+                            <a href="{% url 'diary_entry_detail' day_cell.entry.pk %}" class="calendar-entry-link">
+                                <div class="calendar-date">{{ day_cell.date.day }}</div>
+                                <div class="calendar-entry-pill">Entry saved</div>
+                            </a>
+                            {% elif day_cell.date == today %}
+                            <a href="{% url 'diary_write' %}" class="calendar-entry-link">
+                                <div class="calendar-date">{{ day_cell.date.day }}</div>
+                                <div class="calendar-entry-pill">Write today</div>
+                            </a>
+                            {% else %}
+                            <div class="calendar-date">{{ day_cell.date.day }}</div>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+
+            <div class="chip-row">
+                <span class="chip chip-soft">Entry saved</span>
+                <span class="chip chip-warning">Today can be written</span>
+                <span class="chip">Other days are for review only</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

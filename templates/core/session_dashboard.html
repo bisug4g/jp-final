@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+
+{% block title %}Session Dashboard - Login Activity{% endblock %}
+
+{% block content %}
+<div class="page-shell page-shell-wide">
+    <div class="page-hero">
+        <div class="page-hero-copy">
+            <h1>Session Dashboard</h1>
+            <p>Review where the account has been used, which devices are still active, and whether anything looks unusual.</p>
+        </div>
+        <div class="page-actions">
+            <a href="{% url 'profile' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Profile
+            </a>
+        </div>
+    </div>
+
+    <div class="shell-grid shell-grid-4 mb-4">
+        <div class="shell-stat">
+            <div class="shell-stat-top"><span>Total Sessions</span><i class="fas fa-chart-line"></i></div>
+            <div class="shell-stat-value">{{ total_sessions }}</div>
+            <div class="shell-stat-note">All tracked sessions since monitoring started.</div>
+        </div>
+        <div class="shell-stat">
+            <div class="shell-stat-top"><span>Active Now</span><i class="fas fa-circle-notch"></i></div>
+            <div class="shell-stat-value">{{ active_sessions }}</div>
+            <div class="shell-stat-note">Sessions that are still marked active.</div>
+        </div>
+        <div class="shell-stat">
+            <div class="shell-stat-top"><span>Unique IPs</span><i class="fas fa-globe"></i></div>
+            <div class="shell-stat-value">{{ unique_ip_count }}</div>
+            <div class="shell-stat-note">Distinct networks seen for this account.</div>
+        </div>
+        <div class="shell-stat">
+            <div class="shell-stat-top"><span>Unique Devices</span><i class="fas fa-laptop"></i></div>
+            <div class="shell-stat-value">{{ unique_device_count }}</div>
+            <div class="shell-stat-note">Different device fingerprints tracked so far.</div>
+        </div>
+    </div>
+
+    <div class="shell-sidebar-layout">
+        <div class="shell-grid">
+            <div class="shell-panel">
+                <div class="section-heading"><h5>Device Types</h5></div>
+                {% if device_stats %}
+                    {% for device, count in device_stats.items %}
+                    <div class="meta-row">
+                        <div class="meta-label">{{ device|title }}</div>
+                        <div class="meta-value">{{ count }}</div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-shell"><h5>No device data yet</h5></div>
+                {% endif %}
+            </div>
+
+            <div class="shell-panel">
+                <div class="section-heading"><h5>Browsers</h5></div>
+                {% if browser_stats %}
+                    {% for browser, count in browser_stats.items %}
+                    <div class="meta-row">
+                        <div class="meta-label">{{ browser }}</div>
+                        <div class="meta-value">{{ count }}</div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-shell"><h5>No browser data yet</h5></div>
+                {% endif %}
+            </div>
+
+            <div class="shell-panel">
+                <div class="section-heading"><h5>Operating Systems</h5></div>
+                {% if os_stats %}
+                    {% for os, count in os_stats.items %}
+                    <div class="meta-row">
+                        <div class="meta-label">{{ os }}</div>
+                        <div class="meta-value">{{ count }}</div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-shell"><h5>No OS data yet</h5></div>
+                {% endif %}
+            </div>
+
+            <div class="shell-panel">
+                <div class="section-heading"><h5>Known IPs</h5></div>
+                {% if unique_ips %}
+                <div class="chip-row">
+                    {% for ip in unique_ips %}
+                    <span class="chip">{{ ip }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-shell"><h5>No IP addresses recorded</h5></div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="shell-grid">
+            <div class="shell-card">
+                <div class="shell-card-header">
+                    <div class="section-heading mb-0">
+                        <h4>Currently Active Sessions</h4>
+                        <span class="chip chip-success">{{ active_sessions }} active</span>
+                    </div>
+                </div>
+                <div class="shell-card-body">
+                    {% if current_sessions %}
+                    <div class="session-list">
+                        {% for session in current_sessions %}
+                        <div class="session-row">
+                            <div class="icon-circle">
+                                <i class="fas {% if session.device_type == 'mobile' %}fa-mobile-screen-button{% elif session.device_type == 'tablet' %}fa-tablet-screen-button{% elif session.device_type == 'bot' %}fa-robot{% else %}fa-desktop{% endif %}"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1">{{ session.browser|default:"Unknown Browser" }} on {{ session.os|default:"Unknown OS" }}</h5>
+                                <div class="text-muted small">IP {{ session.ip_address|default:"Unknown" }} · started {{ session.created_at|date:"M d, Y H:i" }}</div>
+                            </div>
+                            <div class="task-actions">
+                                <span class="chip chip-success">Active</span>
+                                <form method="post" action="{% url 'terminate_session' session.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Terminate this session?');">Terminate</button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-shell">
+                        <h5>No active sessions</h5>
+                        <p class="text-muted mb-0">The account is currently offline everywhere.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="shell-card">
+                <div class="shell-card-header">
+                    <div class="section-heading mb-0">
+                        <h4>Recent Sessions</h4>
+                        <span class="chip">{{ recent_sessions|length }} shown</span>
+                    </div>
+                </div>
+                <div class="shell-card-body">
+                    {% if recent_sessions %}
+                    <div class="session-list">
+                        {% for session in recent_sessions %}
+                        <div class="session-row">
+                            <div class="icon-circle">
+                                <i class="fas {% if session.device_type == 'mobile' %}fa-mobile-screen-button{% elif session.device_type == 'tablet' %}fa-tablet-screen-button{% elif session.device_type == 'bot' %}fa-robot{% else %}fa-desktop{% endif %}"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1">
+                                    {{ session.browser|default:"Unknown Browser" }} on {{ session.os|default:"Unknown OS" }}
+                                    {% if session.is_suspicious %}
+                                    <span class="chip chip-warning ms-2">Suspicious</span>
+                                    {% endif %}
+                                </h5>
+                                <div class="text-muted small">IP {{ session.ip_address|default:"Unknown" }} · duration {{ session.duration }}</div>
+                            </div>
+                            <div>
+                                <span class="chip {% if session.is_active %}chip-success{% else %}chip-soft{% endif %}">
+                                    {% if session.is_active %}Active{% else %}Expired{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-shell"><h5>No recent sessions</h5></div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if suspicious_sessions %}
+            <div class="shell-danger shell-panel">
+                <div class="section-heading">
+                    <h4>Suspicious Sessions</h4>
+                    <span class="chip chip-warning">{{ suspicious_sessions|length }} flagged</span>
+                </div>
+                <div class="session-list">
+                    {% for session in suspicious_sessions %}
+                    <div class="list-row">
+                        <div>
+                            <strong>{{ session.browser|default:"Unknown Browser" }} on {{ session.os|default:"Unknown OS" }}</strong>
+                            <div class="text-muted small">IP {{ session.ip_address|default:"Unknown" }} · country {{ session.ip_country|default:"Unknown" }} · {{ session.device_type|title }}</div>
+                        </div>
+                        <span class="chip chip-warning">Review</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="surface-note mt-4">
+        <strong>About this dashboard:</strong>
+        <ul class="mb-0">
+            <li>This dashboard tracks sessions only from the moment monitoring was enabled.</li>
+            <li>Historical sessions from before tracking was enabled will not appear.</li>
+            <li>Sessions expire after 24 hours of inactivity.</li>
+            <li>You can terminate active sessions to force logout from specific devices.</li>
+            <li>IP geolocation data may not always be exact.</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

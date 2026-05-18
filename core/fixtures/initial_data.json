@@ -1,0 +1,242 @@
+[
+  {
+    "model": "core.dailythought",
+    "pk": 1,
+    "fields": {
+      "content": "The lotus blooms most beautifully from the deepest and thickest mud.",
+      "author": "Buddhist Proverb",
+      "category": "resilience",
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.dailythought",
+    "pk": 2,
+    "fields": {
+      "content": "Your strength is not measured by how much you can carry, but by how you rise after being broken.",
+      "author": "Unknown",
+      "category": "resilience",
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.dailythought",
+    "pk": 3,
+    "fields": {
+      "content": "Every ending is a new beginning. Trust the journey.",
+      "author": "Unknown",
+      "category": "growth",
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.dailythought",
+    "pk": 4,
+    "fields": {
+      "content": "You are stronger than you know, more capable than you imagine, and loved more than you realize.",
+      "author": "Unknown",
+      "category": "self_compassion",
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.dailythought",
+    "pk": 5,
+    "fields": {
+      "content": "The path to healing begins with a single breath of self-compassion.",
+      "author": "Unknown",
+      "category": "self_compassion",
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.dailythought",
+    "pk": 6,
+    "fields": {
+      "content": "Courage doesn't always roar. Sometimes courage is the quiet voice at the end of the day saying, 'I will try again tomorrow.'",
+      "author": "Mary Anne Radmacher",
+      "category": "resilience",
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.dailythought",
+    "pk": 7,
+    "fields": {
+      "content": "Believe you can and you're halfway there.",
+      "author": "Theodore Roosevelt",
+      "category": "growth",
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.dailythought",
+    "pk": 8,
+    "fields": {
+      "content": "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+      "author": "Winston Churchill",
+      "category": "professional",
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.dailythought",
+    "pk": 9,
+    "fields": {
+      "content": "The only way to do great work is to love what you do.",
+      "author": "Steve Jobs",
+      "category": "professional",
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.dailythought",
+    "pk": 10,
+    "fields": {
+      "content": "Your present circumstances don't determine where you go; they merely determine where you start.",
+      "author": "Nido Qubein",
+      "category": "growth",
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.dailythought",
+    "pk": 11,
+    "fields": {
+      "content": "Be gentle with yourself. You're doing the best you can.",
+      "author": "Unknown",
+      "category": "self_compassion",
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.dailythought",
+    "pk": 12,
+    "fields": {
+      "content": "In the middle of difficulty lies opportunity.",
+      "author": "Albert Einstein",
+      "category": "growth",
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.dailythought",
+    "pk": 13,
+    "fields": {
+      "content": "The best time to plant a tree was 20 years ago. The second best time is now.",
+      "author": "Chinese Proverb",
+      "category": "growth",
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.dailythought",
+    "pk": 14,
+    "fields": {
+      "content": "You are allowed to be both a masterpiece and a work in progress simultaneously.",
+      "author": "Sophia Bush",
+      "category": "self_compassion",
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.dailythought",
+    "pk": 15,
+    "fields": {
+      "content": "Don't watch the clock; do what it does. Keep going.",
+      "author": "Sam Levenson",
+      "category": "professional",
+      "is_active": true
+    }
+  },
+  {
+    "model": "diary.diaryprompt",
+    "pk": 1,
+    "fields": {
+      "question": "What are three things you're grateful for today, and why?",
+      "category": "gratitude",
+      "is_active": true
+    }
+  },
+  {
+    "model": "diary.diaryprompt",
+    "pk": 2,
+    "fields": {
+      "question": "What challenged you today, and what did you learn from it?",
+      "category": "challenges",
+      "is_active": true
+    }
+  },
+  {
+    "model": "diary.diaryprompt",
+    "pk": 3,
+    "fields": {
+      "question": "How did you take care of yourself today?",
+      "category": "self_awareness",
+      "is_active": true
+    }
+  },
+  {
+    "model": "diary.diaryprompt",
+    "pk": 4,
+    "fields": {
+      "question": "What are you looking forward to tomorrow?",
+      "category": "general",
+      "is_active": true
+    }
+  },
+  {
+    "model": "diary.diaryprompt",
+    "pk": 5,
+    "fields": {
+      "question": "Describe a moment today when you felt at peace.",
+      "category": "self_awareness",
+      "is_active": true
+    }
+  },
+  {
+    "model": "diary.diaryprompt",
+    "pk": 6,
+    "fields": {
+      "question": "What progress did you make toward your goals today?",
+      "category": "professional",
+      "is_active": true
+    }
+  },
+  {
+    "model": "diary.diaryprompt",
+    "pk": 7,
+    "fields": {
+      "question": "How did you show kindness to yourself or others today?",
+      "category": "relationships",
+      "is_active": true
+    }
+  },
+  {
+    "model": "diary.diaryprompt",
+    "pk": 8,
+    "fields": {
+      "question": "What would you tell your younger self about today?",
+      "category": "self_awareness",
+      "is_active": true
+    }
+  },
+  {
+    "model": "diary.diaryprompt",
+    "pk": 9,
+    "fields": {
+      "question": "What emotion was most present for you today? Explore it.",
+      "category": "self_awareness",
+      "is_active": true
+    }
+  },
+  {
+    "model": "diary.diaryprompt",
+    "pk": 10,
+    "fields": {
+      "question": "What is one thing you want to remember about today?",
+      "category": "general",
+      "is_active": true
+    }
+  }
+]

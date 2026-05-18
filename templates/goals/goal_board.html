@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block title %}Goal Board - JaytiPargal.in{% endblock %}
+
+{% block extra_css %}
+<style>
+    .kanban-column {
+        min-height: 400px;
+        background: rgba(244,194,194,0.1);
+        border-radius: 8px;
+        padding: 1rem;
+    }
+    .kanban-card {
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .kanban-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .status-pending { border-left: 4px solid #6c757d; }
+    .status-in_progress { border-left: 4px solid #0d6efd; }
+    .status-done { border-left: 4px solid #198754; }
+    .status-blocked { border-left: 4px solid #dc3545; }
+    .status-at_risk { border-left: 4px solid #ffc107; }
+    .status-overdue { border-left: 4px solid #dc3545; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 style="color: var(--dusty-rose);"><i class="fas fa-columns me-2"></i>Goal Board</h2>
+            <p class="text-muted">Kanban view of all your tasks across goals.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{% url 'goal_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-list me-2"></i>List View
+            </a>
+        </div>
+    </div>
+
+    <!-- Kanban Board -->
+    <div class="row">
+        <!-- Pending -->
+        <div class="col-md-4 col-lg-2 mb-3">
+            <h6 class="mb-2"><span class="badge bg-secondary">Pending</span></h6>
+            <div class="kanban-column">
+                {% for task in tasks_pending %}
+                <div class="card kanban-card mb-2 status-pending" onclick="window.location='{% url 'goal_detail' task.goal.pk %}'">
+                    <div class="card-body py-2">
+                        <p class="mb-1 small fw-bold">{{ task.title|truncatechars:40 }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">{{ task.goal.title|truncatechars:15 }}</small>
+                            {% if task.due_date %}
+                            <small class="{% if task.due_date < today %}text-danger{% endif %}">{{ task.due_date|date:"M d" }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted small text-center">No pending tasks</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- In Progress -->
+        <div class="col-md-4 col-lg-2 mb-3">
+            <h6 class="mb-2"><span class="badge bg-primary">In Progress</span></h6>
+            <div class="kanban-column">
+                {% for task in tasks_in_progress %}
+                <div class="card kanban-card mb-2 status-in_progress" onclick="window.location='{% url 'goal_detail' task.goal.pk %}'">
+                    <div class="card-body py-2">
+                        <p class="mb-1 small fw-bold">{{ task.title|truncatechars:40 }}</p>
+                        <div class="progress" style="height: 4px;">
+                            <div class="progress-bar" style="width: {{ task.completion_percentage }}%"></div>
+                        </div>
+                        <small class="text-muted">{{ task.goal.title|truncatechars:15 }}</small>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted small text-center">No tasks in progress</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Done -->
+        <div class="col-md-4 col-lg-2 mb-3">
+            <h6 class="mb-2"><span class="badge bg-success">Done</span></h6>
+            <div class="kanban-column">
+                {% for task in tasks_done %}
+                <div class="card kanban-card mb-2 status-done" onclick="window.location='{% url 'goal_detail' task.goal.pk %}'">
+                    <div class="card-body py-2">
+                        <p class="mb-1 small fw-bold text-decoration-line-through">{{ task.title|truncatechars:40 }}</p>
+                        <small class="text-muted">{{ task.goal.title|truncatechars:15 }}</small>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted small text-center">No completed tasks</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Blocked -->
+        <div class="col-md-4 col-lg-2 mb-3">
+            <h6 class="mb-2"><span class="badge bg-danger">Blocked</span></h6>
+            <div class="kanban-column">
+                {% for task in tasks_blocked %}
+                <div class="card kanban-card mb-2 status-blocked" onclick="window.location='{% url 'goal_detail' task.goal.pk %}'">
+                    <div class="card-body py-2">
+                        <p class="mb-1 small fw-bold">{{ task.title|truncatechars:40 }}</p>
+                        <small class="text-danger">{{ task.blocked_reason|truncatechars:30 }}</small>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted small text-center">No blocked tasks</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- At Risk -->
+        <div class="col-md-4 col-lg-2 mb-3">
+            <h6 class="mb-2"><span class="badge bg-warning text-dark">At Risk</span></h6>
+            <div class="kanban-column">
+                {% for task in tasks_at_risk %}
+                <div class="card kanban-card mb-2 status-at_risk" onclick="window.location='{% url 'goal_detail' task.goal.pk %}'">
+                    <div class="card-body py-2">
+                        <p class="mb-1 small fw-bold">{{ task.title|truncatechars:40 }}</p>
+                        <small class="text-muted">{{ task.goal.title|truncatechars:15 }}</small>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted small text-center">No at-risk tasks</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Overdue -->
+        <div class="col-md-4 col-lg-2 mb-3">
+            <h6 class="mb-2"><span class="badge bg-danger">Overdue</span></h6>
+            <div class="kanban-column">
+                {% for task in tasks_overdue %}
+                <div class="card kanban-card mb-2 status-overdue" onclick="window.location='{% url 'goal_detail' task.goal.pk %}'">
+                    <div class="card-body py-2">
+                        <p class="mb-1 small fw-bold">{{ task.title|truncatechars:40 }}</p>
+                        <small class="text-danger">Due {{ task.due_date|date:"M d" }}</small>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted small text-center">No overdue tasks</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

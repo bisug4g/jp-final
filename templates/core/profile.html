@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile - jayti{% endblock %}
+
+{% block content %}
+<div class="page-shell">
+    <div class="page-hero">
+        <div class="page-hero-copy">
+            <h1>Profile</h1>
+            <p>Keep your identity, language preferences, and reminder settings aligned across the whole app.</p>
+        </div>
+        <div class="page-actions">
+            <a href="{% url 'session_dashboard' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-shield-halved me-2"></i>Session Activity
+            </a>
+        </div>
+    </div>
+
+    <div class="shell-sidebar-layout">
+        <div class="shell-card">
+            <div class="shell-card-header">
+                <div class="section-heading mb-0">
+                    <div>
+                        <h4>Personal Details</h4>
+                        <p class="section-subtitle">These settings shape the app header, prompts, and daily reminders.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="shell-card-body">
+                <form method="post" enctype="multipart/form-data" class="shell-form">
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="id_display_name" class="form-label">Display Name</label>
+                            <input type="text" id="id_display_name" name="display_name" class="form-control" value="{{ user_profile.display_name|default:'Jayti' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="id_username" class="form-label">Username</label>
+                            <input type="text" id="id_username" class="form-control" value="{{ user.username }}" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="id_preferred_language" class="form-label">Preferred Language</label>
+                            <select id="id_preferred_language" name="preferred_language" class="form-select">
+                                <option value="en" {% if user_profile.preferred_language == 'en' %}selected{% endif %}>English</option>
+                                <option value="hi" {% if user_profile.preferred_language == 'hi' %}selected{% endif %}>Hindi</option>
+                                <option value="he" {% if user_profile.preferred_language == 'he' %}selected{% endif %}>Hinglish</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="id_notification_time" class="form-label">Reminder Time</label>
+                            <input type="time" id="id_notification_time" name="notification_time" class="form-control" value="{{ user_profile.notification_time|time:'H:i'|default:'09:00' }}">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="id_profile_picture" class="form-label">Profile Picture</label>
+                        <input type="file" id="id_profile_picture" name="profile_picture" class="form-control" accept="image/*">
+                    </div>
+
+                    <div class="shell-actions">
+                        <a href="{% url 'password_change' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-key me-2"></i>Change Password
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="shell-grid">
+            <div class="shell-panel text-center">
+                {% if user_profile.profile_picture %}
+                <img src="{{ user_profile.profile_picture.url }}" alt="Profile picture" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+                {% else %}
+                <div class="icon-circle mx-auto mb-3" style="width: 88px; height: 88px; font-size: 1.8rem;">
+                    <i class="fas fa-user"></i>
+                </div>
+                {% endif %}
+                <h4 class="mb-1">{{ user_profile.display_name|default:'Jayti' }}</h4>
+                <p class="mb-0 text-muted">{{ user.username }}</p>
+            </div>
+
+            <div class="shell-panel">
+                <div class="section-heading mb-2">
+                    <h5>Account Snapshot</h5>
+                </div>
+                <div class="meta-list">
+                    <div class="meta-row">
+                        <div class="meta-label">Language</div>
+                        <div class="meta-value">{{ user_profile.get_preferred_language_display|default:'English' }}</div>
+                    </div>
+                    <div class="meta-row">
+                        <div class="meta-label">Reminder</div>
+                        <div class="meta-value">{{ user_profile.notification_time|time:'H:i'|default:'09:00' }}</div>
+                    </div>
+                    <div class="meta-row">
+                        <div class="meta-label">Timezone</div>
+                        <div class="meta-value">{{ user_profile.timezone|default:'Asia/Kolkata' }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="surface-note">
+                <strong>Why this matters:</strong> these settings power greetings, reminders, and the way Jayti appears throughout the product.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

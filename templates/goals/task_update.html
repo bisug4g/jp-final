@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Update Task - {{ task.title }}{% endblock %}
+
+{% block content %}
+<div class="page-shell" style="max-width: 900px;">
+    <div class="page-breadcrumbs">
+        <a href="{% url 'goal_list' %}">Goals</a>
+        <span>/</span>
+        <a href="{% url 'goal_detail' task.goal.pk %}">{{ task.goal.title|truncatechars:28 }}</a>
+        <span>/</span>
+        <span class="current">Update Task</span>
+    </div>
+
+    <div class="shell-card">
+        <div class="shell-card-header">
+            <div class="section-heading mb-0">
+                <div>
+                    <h4>Update Task</h4>
+                    <p class="section-subtitle">{{ task.title }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="shell-card-body">
+            <form method="post" class="shell-form">
+                {% csrf_token %}
+                <div>
+                    <label class="form-label">Status</label>
+                    <select class="form-select" id="task-status" name="status" required>
+                        <option value="pending" {% if task.status == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="in_progress" {% if task.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                        <option value="done" {% if task.status == 'done' %}selected{% endif %}>Done</option>
+                        <option value="blocked" {% if task.status == 'blocked' %}selected{% endif %}>Blocked</option>
+                        <option value="at_risk" {% if task.status == 'at_risk' %}selected{% endif %}>At Risk</option>
+                        <option value="overdue" {% if task.status == 'overdue' %}selected{% endif %}>Overdue</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label">Completion Percentage</label>
+                    <input type="range" class="form-range" id="completion_percentage" name="completion_percentage" min="0" max="100" value="{{ task.completion_percentage }}" oninput="document.getElementById('percentValue').innerText = this.value + '%'">
+                    <div class="text-center"><strong id="percentValue">{{ task.completion_percentage }}%</strong></div>
+                </div>
+                <div id="blocked-reason-wrapper" {% if task.status != 'blocked' %}style="display:none;"{% endif %}>
+                    <label class="form-label">Blocked Reason</label>
+                    <textarea class="form-control" name="blocked_reason" rows="4" placeholder="Why is this task blocked?">{{ task.blocked_reason }}</textarea>
+                </div>
+                <div class="surface-note">
+                    <strong>Tip:</strong> setting a task to done should usually mean 100% completion and a crisp closing note in the goal timeline.
+                </div>
+                <div class="shell-actions">
+                    <a href="{% url 'goal_detail' task.goal.pk %}" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Update Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const taskStatus = document.getElementById('task-status');
+const blockedReasonWrapper = document.getElementById('blocked-reason-wrapper');
+if (taskStatus && blockedReasonWrapper) {
+  taskStatus.addEventListener('change', () => {
+    blockedReasonWrapper.style.display = taskStatus.value === 'blocked' ? 'block' : 'none';
+  });
+}
+</script>
+{% endblock %}

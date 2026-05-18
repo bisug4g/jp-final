@@ -1,0 +1,17 @@
+[
+  {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+      "username": "jayati",
+      "password": "pbkdf2_sha256$600000$auto_generated$change_on_first_login",
+      "is_superuser": true,
+      "is_staff": true,
+      "is_active": true,
+      "first_name": "Jayti",
+      "last_name": "Pargal",
+      "email": "jayti@jaytipargal.in",
+      "date_joined": "2026-02-06T00:00:00+05:30"
+    }
+  }
+]

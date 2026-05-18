@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ session.title }} - Tangred{% endblock %}
+
+{% block content %}
+<div class="page-shell page-shell-wide">
+    <div class="page-breadcrumbs">
+        <a href="{% url 'tangred_home' %}">Tangred</a>
+        <span>/</span>
+        <span class="current">{{ session.title|truncatechars:42 }}</span>
+    </div>
+
+    <div class="page-hero">
+        <div class="page-hero-copy">
+            <h1>{{ session.title }}</h1>
+            <p>{{ session.style_goal|default:"Tangred session for private wardrobe planning and dressed-up look direction." }}</p>
+        </div>
+        <div class="page-actions">
+            <span class="chip">{{ session.get_status_display }}</span>
+            <form method="post" action="{% url 'tangred_run_session' session.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary" {% if not agent_ready %}disabled{% endif %}>
+                    <i class="fas fa-sparkles me-2"></i>Run Tangred
+                </button>
+            </form>
+            <a href="{% url 'tan_studio_home' %}" class="btn btn-outline-secondary">Open Tan Studio</a>
+        </div>
+    </div>
+
+    <div class="shell-sidebar-layout">
+        <div class="shell-grid">
+            <div class="shell-card">
+                <div class="shell-card-header">
+                    <div class="section-heading mb-0"><h4>Profile Brief</h4></div>
+                </div>
+                <div class="shell-card-body">
+                    <div class="meta-list">
+                        <div class="meta-row">
+                            <div class="meta-label">Occasion</div>
+                            <div class="meta-value">{{ session.occasion|default:"-" }}</div>
+                        </div>
+                        <div class="meta-row">
+                            <div class="meta-label">Body Frame</div>
+                            <div class="meta-value">{{ session.body_frame|default:"-" }}</div>
+                        </div>
+                        <div class="meta-row">
+                            <div class="meta-label">Skin Tone</div>
+                            <div class="meta-value">{{ session.skin_tone|default:"-" }}</div>
+                        </div>
+                        <div class="meta-row">
+                            <div class="meta-label">Preferred Palette</div>
+                            <div class="meta-value">{{ session.preferred_palette|default:"-" }}</div>
+                        </div>
+                        <div class="meta-row">
+                            <div class="meta-label">Avoid Palette</div>
+                            <div class="meta-value">{{ session.avoid_palette|default:"-" }}</div>
+                        </div>
+                    </div>
+                    {% if session.wardrobe_notes %}
+                    <div class="prose-surface mt-3" style="white-space: pre-wrap;">{{ session.wardrobe_notes }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="shell-card">
+                <div class="shell-card-header">
+                    <div class="section-heading mb-0"><h4>Reference Photos</h4></div>
+                </div>
+                <div class="shell-card-body">
+                    {% if session.photos.all %}
+                    <div class="row g-3">
+                        {% for photo in session.photos.all %}
+                        <div class="col-md-6">
+                            <div class="surface-note" style="padding: 0;">
+                                <img src="{{ photo.access_url }}" alt="{{ photo.caption|default:session.title }}" style="width: 100%; display: block; border-radius: 18px 18px 0 0; object-fit: cover; min-height: 240px;">
+                                <div style="padding: 1rem;">
+                                    {{ photo.caption|default:"Stored reference photo" }}
+                                    <div class="text-muted small mt-1">{{ photo.original_name|default:photo.storage_backend }} · {{ photo.storage_backend|title }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-shell">
+                        <h4>No photos uploaded</h4>
+                        <p class="text-muted">Tangred needs at least one reference photo before analysis.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="shell-grid">
+            <div class="shell-panel">
+                <div class="section-heading mb-2"><h5>Agent Status</h5></div>
+                <div class="meta-list">
+                    <div class="meta-row">
+                        <div class="meta-label">Tangred AI</div>
+                        <div class="meta-value">{% if agent_ready %}Ready{% else %}Unavailable{% endif %}</div>
+                    </div>
+                    <div class="meta-row">
+                        <div class="meta-label">Styleboard</div>
+                        <div class="meta-value">{% if stitch_ready %}Stitch Ready{% else %}Unavailable{% endif %}</div>
+                    </div>
+                    <div class="meta-row">
+                        <div class="meta-label">OpenRouter</div>
+                        <div class="meta-value">{{ session.openrouter_model|default:"-" }}</div>
+                    </div>
+                    <div class="meta-row">
+                        <div class="meta-label">Photo Storage</div>
+                        <div class="meta-value">{{ photo_storage_backend|title }}</div>
+                    </div>
+                </div>
+            </div>
+
+            {% if session.status == "READY" %}
+            <div class="shell-card">
+                <div class="shell-card-header">
+                    <div class="section-heading mb-0"><h4>Style Identity</h4></div>
+                </div>
+                <div class="shell-card-body">
+                    <div class="prose-surface">{{ session.style_identity }}</div>
+                    <div class="prose-surface mt-3" style="white-space: pre-wrap;">{{ session.body_summary }}</div>
+                </div>
+            </div>
+
+            <div class="shell-card">
+                <div class="shell-card-header">
+                    <div class="section-heading mb-0"><h4>Dressed-Up Direction</h4></div>
+                </div>
+                <div class="shell-card-body">
+                    <div class="prose-surface" style="white-space: pre-wrap;">{{ session.outfit_direction }}</div>
+                </div>
+            </div>
+
+            <div class="shell-card">
+                <div class="shell-card-header">
+                    <div class="section-heading mb-0"><h4>Wardrobe Blueprint</h4></div>
+                </div>
+                <div class="shell-card-body">
+                    <div class="list-stack">
+                        {% for item in session.wardrobe_blueprint %}
+                        <div class="surface-note">{{ item }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="shell-card">
+                <div class="shell-card-header">
+                    <div class="section-heading mb-0"><h4>Accessories And Finish</h4></div>
+                </div>
+                <div class="shell-card-body">
+                    <div class="prose-surface" style="white-space: pre-wrap;">{{ session.accessory_focus }}</div>
+                    <div class="prose-surface mt-3" style="white-space: pre-wrap;">{{ session.color_story }}</div>
+                    <div class="prose-surface mt-3" style="white-space: pre-wrap;">{{ session.confidence_notes }}</div>
+                </div>
+            </div>
+
+            {% if session.styleboard_screen %}
+            <div class="shell-card">
+                <div class="shell-card-header">
+                    <div class="section-heading mb-0"><h4>Generated Styleboard</h4></div>
+                </div>
+                <div class="shell-card-body">
+                    {% if session.styleboard_screen.screenshot_url %}
+                    <img src="{{ session.styleboard_screen.screenshot_url }}" alt="{{ session.styleboard_screen.title }}" style="width: 100%; border-radius: 18px; display: block;">
+                    {% endif %}
+                    <div class="shell-actions mt-3">
+                        <a href="{% url 'tan_studio_screen_detail' session.styleboard_screen.pk %}" class="btn btn-primary">Open Styleboard</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="surface-note">
+                <strong>What Tangred does:</strong> it turns your profile, palette, and wardrobe intent into a dressed-up direction, then can convert that advice into a Tan Studio styleboard through Stitch.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

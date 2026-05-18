@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+
+{% block title %}Vimshottari Dasha - jayti{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dasha-timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+    
+    .dasha-timeline::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: linear-gradient(to bottom, var(--blush-rose), var(--lavender-mist));
+        border-radius: 3px;
+    }
+    
+    .dasha-item {
+        position: relative;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .dasha-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 20px rgba(244,194,194,0.2);
+    }
+    
+    .dasha-item::before {
+        content: '';
+        position: absolute;
+        left: -36px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: var(--blush-rose);
+        border: 3px solid white;
+        box-shadow: 0 0 0 3px var(--blush-rose);
+    }
+    
+    .dasha-item.current::before {
+        background: var(--dusty-rose);
+        box-shadow: 0 0 0 3px var(--dusty-rose), 0 0 0 6px rgba(244,194,194,0.3);
+        animation: pulse 2s infinite;
+    }
+    
+    .dasha-item.past::before {
+        background: #ccc;
+        box-shadow: 0 0 0 3px #ccc;
+    }
+    
+    .dasha-item.future::before {
+        background: var(--lavender-mist);
+        box-shadow: 0 0 0 3px var(--lavender-mist);
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: translateY(-50%) scale(1); }
+        50% { transform: translateY(-50%) scale(1.1); }
+    }
+    
+    .dasha-lord {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.25rem;
+        color: var(--warm-charcoal);
+    }
+    
+    .dasha-dates {
+        font-size: 0.9rem;
+        color: var(--muted-mauve);
+    }
+    
+    .dasha-theme {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background: rgba(244,194,194,0.2);
+        border-radius: 15px;
+        font-size: 0.85rem;
+        color: var(--dusty-rose);
+        margin-top: 0.5rem;
+    }
+    
+    .current-dasha-card {
+        background: linear-gradient(135deg, rgba(244,194,194,0.15), rgba(230,230,250,0.15));
+        border: 2px solid var(--blush-rose);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .antardasha-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+    
+    .antardasha-item {
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        border-left: 3px solid var(--blush-rose);
+    }
+    
+    .antardasha-item.current-ad {
+        border-left-color: var(--dusty-rose);
+        background: rgba(244,194,194,0.1);
+    }
+    
+    .planet-icon {
+        font-size: 1.5rem;
+        margin-right: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-5 mb-3">Vimshottari Dasha</h1>
+        <p class="text-mauve">Planetary Periods based on Moon's position at birth</p>
+    </div>
+    
+    {% if current_dasha and current_interpretation %}
+    <!-- Current Dasha Highlight -->
+    <div class="current-dasha-card">
+        <div class="row">
+            <div class="col-lg-8">
+                <h4 class="mb-3">
+                    <i class="fas fa-star text-blush me-2"></i>
+                    Currently Running: <span class="dasha-lord">{{ current_dasha.lord }} Mahadasha</span>
+                </h4>
+                <p class="text-muted mb-2">
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    {{ current_dasha.start_date|date:"F d, Y" }} — {{ current_dasha.end_date|date:"F d, Y" }}
+                </p>
+                <p class="lead">{{ current_interpretation.theme }}</p>
+                <p>{{ current_interpretation.focus }}</p>
+                <div class="dasha-theme">
+                    <i class="fas fa-lightbulb me-1"></i>{{ current_interpretation.advice }}
+                </div>
+                {% if current_interpretation.challenges %}
+                <p class="text-muted mt-3 mb-0">
+                    <i class="fas fa-exclamation-triangle me-2 text-warning"></i>
+                    <strong>Watch for:</strong> {{ current_interpretation.challenges }}
+                </p>
+                {% endif %}
+            </div>
+            <div class="col-lg-4 text-center">
+                <div class="p-4 bg-white rounded-circle d-inline-block" style="width: 150px; height: 150px; line-height: 100px;">
+                    <span style="font-size: 4rem;">
+                        {% if current_dasha.lord == 'Sun' %}☉
+                        {% elif current_dasha.lord == 'Moon' %}☽
+                        {% elif current_dasha.lord == 'Mars' %}♂
+                        {% elif current_dasha.lord == 'Mercury' %}☿
+                        {% elif current_dasha.lord == 'Jupiter' %}♃
+                        {% elif current_dasha.lord == 'Venus' %}♀
+                        {% elif current_dasha.lord == 'Saturn' %}♄
+                        {% elif current_dasha.lord == 'Rahu' %}☊
+                        {% elif current_dasha.lord == 'Ketu' %}☋
+                        {% endif %}
+                    </span>
+                </div>
+                <p class="mt-3 text-muted">
+                    {{ current_dasha.duration_years|floatformat:2 }} years total
+                </p>
+            </div>
+        </div>
+        
+        <!-- Current Antardasha -->
+        {% if current_antardasha %}
+        <div class="mt-4 pt-4 border-top">
+            <h5 class="mb-3">
+                <i class="fas fa-moon text-blush me-2"></i>
+                Current Sub-Period (Antardasha): {{ current_antardasha.lord }}
+            </h5>
+            <p class="text-muted mb-0">
+                {{ current_antardasha.start_date|date:"F d, Y" }} — {{ current_antardasha.end_date|date:"F d, Y" }}
+            </p>
+        </div>
+        {% endif %}
+        
+        <!-- All Antardashas of Current Mahadasha -->
+        {% if antardashas %}
+        <div class="mt-4 pt-4 border-top">
+            <h6 class="mb-3">All Sub-Periods in this Mahadasha:</h6>
+            <div class="antardasha-list">
+                {% for ad in antardashas %}
+                <div class="antardasha-item {% if ad == current_antardasha %}current-ad{% endif %}">
+                    <strong>{{ ad.lord }}</strong>
+                    <br>
+                    <small class="text-muted">
+                        {{ ad.start_date|date:"M Y" }} — {{ ad.end_date|date:"M Y" }}
+                    </small>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    <!-- Complete Dasha Timeline -->
+    <div class="card">
+        <div class="card-header bg-transparent">
+            <h5 class="mb-0">
+                <i class="fas fa-history text-blush me-2"></i>
+                Complete Dasha Cycle
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="dasha-timeline">
+                {% for dasha in dasha_periods %}
+                <div class="dasha-item {% if dasha.is_running %}current{% elif dasha.is_past %}past{% else %}future{% endif %}">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <span class="planet-icon">
+                                {% if dasha.lord == 'Sun' %}☉
+                                {% elif dasha.lord == 'Moon' %}☽
+                                {% elif dasha.lord == 'Mars' %}♂
+                                {% elif dasha.lord == 'Mercury' %}☿
+                                {% elif dasha.lord == 'Jupiter' %}♃
+                                {% elif dasha.lord == 'Venus' %}♀
+                                {% elif dasha.lord == 'Saturn' %}♄
+                                {% elif dasha.lord == 'Rahu' %}☊
+                                {% elif dasha.lord == 'Ketu' %}☋
+                                {% endif %}
+                            </span>
+                            <span class="dasha-lord">{{ dasha.lord }}</span>
+                            {% if dasha.is_running %}
+                            <span class="badge bg-primary ms-2">Current</span>
+                            {% endif %}
+                        </div>
+                        <span class="text-muted">{{ dasha.duration_years|floatformat:2 }} years</span>
+                    </div>
+                    <p class="dasha-dates mt-2 mb-1">
+                        {{ dasha.start_date|date:"F Y" }} — {{ dasha.end_date|date:"F Y" }}
+                    </p>
+                    <p class="small text-muted mb-0">{{ dasha.interpretation.theme }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Navigation -->
+    <div class="text-center mt-4">
+        <a href="{% url 'astro_dashboard' %}" class="btn btn-outline-secondary me-2">
+            <i class="fas fa-arrow-left me-2"></i>Back to Astro
+        </a>
+        <a href="{% url 'birth_chart' %}" class="btn btn-outline-primary me-2">
+            <i class="fas fa-chart-pie me-2"></i>Birth Chart
+        </a>
+        <a href="{% url 'predictions' %}" class="btn btn-primary">
+            <i class="fas fa-star me-2"></i>View Predictions
+        </a>
+    </div>
+</div>
+{% endblock %}
