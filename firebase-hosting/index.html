@@ -1,23 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Jayti – Loading…</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Jayti — Personal Life Companion 💝</title>
+  <meta name="description" content="A beautiful personal companion app — Notes, Diary, Goals, Astrology and AI Chat."/>
+  <meta property="og:title" content="Jayti — Personal Life Companion 💝"/>
+  <meta property="og:description" content="Your personal space for notes, diary, goals, astrology and AI guidance."/>
+  <meta property="og:image" content="https://jpfinal-c9340.web.app/screenshots/dashboard.png"/>
+  <meta property="og:url" content="https://jpfinal-c9340.web.app"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <link rel="icon" href="/icon-192x192.png"/>
   <style>
+    :root{--pink:#e91e8c;--pink-light:#fce4ec;--pink-mid:#f48fb1;--dark:#1a0010;--text:#4a1030}
     *{margin:0;padding:0;box-sizing:border-box}
-    body{min-height:100vh;display:flex;align-items:center;justify-content:center;
-         flex-direction:column;background:linear-gradient(135deg,#fff5f7 0%,#fce4ec 100%);
-         font-family:'Georgia',serif;color:#c2185b}
-    .heart{font-size:3rem;animation:pulse 1.2s ease-in-out infinite}
-    @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.2);opacity:.7}}
-    p{margin-top:1.2rem;font-size:1rem;opacity:.7;letter-spacing:.04em}
+    body{font-family:'Georgia',serif;color:var(--text);overflow-x:hidden;background:#fff}
+    .hero{background:linear-gradient(160deg,#fff5f7 0%,#fce4ec 50%,#f8bbd9 100%);padding:60px 20px 40px;text-align:center}
+    .hero-icon{font-size:4rem;display:block;margin-bottom:16px;animation:float 3s ease-in-out infinite}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+    .hero h1{font-size:clamp(2rem,6vw,3.5rem);color:var(--pink);margin-bottom:12px}
+    .hero p{font-size:clamp(1rem,2.5vw,1.2rem);color:#7b3055;max-width:500px;margin:0 auto 32px;line-height:1.6}
+    .btn-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:48px}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:50px;font-size:1rem;font-family:inherit;text-decoration:none;font-weight:600;transition:transform .2s,box-shadow .2s;border:none;cursor:pointer}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(233,30,140,.3)}
+    .btn-primary{background:var(--pink);color:#fff}
+    .btn-secondary{background:#fff;color:var(--pink);border:2px solid var(--pink)}
+    .phone-wrap{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;padding:0 16px}
+    .phone{width:190px;background:#1a0010;border-radius:32px;padding:10px;box-shadow:0 24px 60px rgba(0,0,0,.25);flex-shrink:0}
+    .phone-screen{border-radius:24px;overflow:hidden;background:#fff5f7;aspect-ratio:9/19}
+    .phone-screen img{width:100%;object-fit:cover;object-position:top}
+    .phone-label{text-align:center;font-size:.75rem;color:var(--pink);margin-top:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+    .section{padding:60px 20px}
+    .section-title{text-align:center;font-size:clamp(1.5rem,4vw,2.2rem);color:var(--pink);margin-bottom:36px}
+    .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;max-width:900px;margin:0 auto}
+    .feature{background:var(--pink-light);border-radius:20px;padding:24px;text-align:center;transition:transform .2s}
+    .feature:hover{transform:translateY(-4px)}
+    .feature-icon{font-size:2rem;margin-bottom:10px;display:block}
+    .feature h3{font-size:1rem;color:var(--pink);margin-bottom:6px}
+    .feature p{font-size:.875rem;color:#6b3050;line-height:1.5}
+    .gallery-bg{background:#fff5f7}
+    .gallery{display:flex;gap:16px;overflow-x:auto;padding:0 20px 20px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;max-width:960px;margin:0 auto}
+    .gallery::-webkit-scrollbar{height:4px}
+    .gallery::-webkit-scrollbar-thumb{background:var(--pink-mid);border-radius:4px}
+    .gallery-item{flex-shrink:0;scroll-snap-align:start;text-align:center}
+    .gallery-item img{height:340px;border-radius:16px;box-shadow:0 8px 24px rgba(233,30,140,.15);object-fit:cover;object-position:top}
+    .gallery-item span{display:block;margin-top:8px;font-size:.78rem;color:var(--pink);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+    .download{background:linear-gradient(135deg,var(--pink) 0%,#c2185b 100%);padding:56px 20px;text-align:center;color:#fff}
+    .download h2{font-size:clamp(1.6rem,4vw,2.4rem);margin-bottom:10px}
+    .download p{opacity:.9;margin-bottom:28px;font-size:1.05rem}
+    .btn-white{background:#fff;color:var(--pink);padding:16px 36px;border-radius:50px;font-size:1.1rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:10px;transition:transform .2s,box-shadow .2s}
+    .btn-white:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.25)}
+    .apk-info{margin-top:14px;font-size:.85rem;opacity:.75}
+    footer{text-align:center;padding:28px 20px;font-size:.85rem;color:#9e6080}
+    footer a{color:var(--pink);text-decoration:none}
+    @media(max-width:480px){.phone{width:150px}.btn{padding:12px 20px;font-size:.9rem}}
   </style>
 </head>
 <body>
-  <div class="heart">💝</div>
-  <p>Opening your space…</p>
-  <!-- Firebase project: jpfinal-c9340 -->
-  <!-- Cloud Run service: jayti (asia-south1) -->
+
+<section class="hero">
+  <span class="hero-icon">💝</span>
+  <h1>Jayti</h1>
+  <p>Your personal life companion — a safe, beautiful space just for you.</p>
+  <div class="btn-row">
+    <a href="https://github.com/go4garage2026/jp-final/releases/download/v1.0.0/jayti.apk" class="btn btn-primary">📱 Download Android App</a>
+    <a href="https://github.com/go4garage2026/jp-final" target="_blank" class="btn btn-secondary">⭐ View on GitHub</a>
+  </div>
+  <div class="phone-wrap">
+    <div><div class="phone"><div class="phone-screen"><img src="/screenshots/dashboard.png" alt="Dashboard"/></div></div><p class="phone-label">Dashboard</p></div>
+    <div><div class="phone"><div class="phone-screen"><img src="/screenshots/diary.png" alt="Diary"/></div></div><p class="phone-label">Diary</p></div>
+    <div><div class="phone"><div class="phone-screen"><img src="/screenshots/goals.png" alt="Goals"/></div></div><p class="phone-label">Goals</p></div>
+  </div>
+</section>
+
+<section class="section">
+  <h2 class="section-title">Everything in one place</h2>
+  <div class="features">
+    <div class="feature"><span class="feature-icon">📝</span><h3>Notes</h3><p>Folders, tags, pin, search and PDF export.</p></div>
+    <div class="feature"><span class="feature-icon">📔</span><h3>Diary</h3><p>Daily journal with mood tracking and streaks.</p></div>
+    <div class="feature"><span class="feature-icon">🎯</span><h3>Goals</h3><p>AI-powered task planning and Kanban board.</p></div>
+    <div class="feature"><span class="feature-icon">🔮</span><h3>Astrology</h3><p>Vedic birth chart, Dasha periods and daily insights.</p></div>
+    <div class="feature"><span class="feature-icon">🤖</span><h3>AI Companion</h3><p>Personal AI mentor with daily briefings.</p></div>
+    <div class="feature"><span class="feature-icon">👔</span><h3>Tangred</h3><p>Wardrobe AI with photo sessions and styleboards.</p></div>
+    <div class="feature"><span class="feature-icon">🌙</span><h3>Dark Mode</h3><p>System-aware dark theme for evening use.</p></div>
+    <div class="feature"><span class="feature-icon">📱</span><h3>PWA + Android</h3><p>Installable on any device. Works offline.</p></div>
+  </div>
+</section>
+
+<section class="section gallery-bg">
+  <h2 class="section-title">See it in action</h2>
+  <div class="gallery">
+    <div class="gallery-item"><img src="/screenshots/dashboard.png" alt="Dashboard"/><span>Dashboard</span></div>
+    <div class="gallery-item"><img src="/screenshots/diary.png" alt="Diary"/><span>Diary</span></div>
+    <div class="gallery-item"><img src="/screenshots/goals.png" alt="Goals"/><span>Goals</span></div>
+    <div class="gallery-item"><img src="/screenshots/notes.png" alt="Notes"/><span>Notes</span></div>
+    <div class="gallery-item"><img src="/screenshots/astro.png" alt="Astrology"/><span>Astrology</span></div>
+  </div>
+</section>
+
+<section class="download">
+  <h2>Ready to begin? 💕</h2>
+  <p>Download the Android app and start your journey today.</p>
+  <a href="https://github.com/go4garage2026/jp-final/releases/download/v1.0.0/jayti.apk" class="btn-white">⬇️ Download jayti.apk</a>
+  <p class="apk-info">9.4 MB · Android 8.0+ · Free</p>
+</section>
+
+<footer>
+  <p>Made with 💕 for Jayti · <a href="https://github.com/go4garage2026/jp-final" target="_blank">GitHub</a></p>
+</footer>
+
 </body>
 </html>
