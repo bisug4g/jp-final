@@ -464,12 +464,12 @@ VAPID_PRIVATE_KEY = os.environ.get('VAPID_PRIVATE_KEY', '')
 VAPID_PUBLIC_KEY = os.environ.get('VAPID_PUBLIC_KEY', '')
 VAPID_ADMIN_EMAIL = os.environ.get('VAPID_ADMIN_EMAIL', 'admin@jaytibirthday.in')
 
-# Firebase public web configuration (safe to expose in frontend if provided)
+# ── Firebase (project: jpfinal-c9340) ────────────────────────────────────────
 FIREBASE_API_KEY = os.environ.get('FIREBASE_API_KEY', '')
-FIREBASE_AUTH_DOMAIN = os.environ.get('FIREBASE_AUTH_DOMAIN', '')
-FIREBASE_PROJECT_ID = os.environ.get('FIREBASE_PROJECT_ID', '')
-FIREBASE_STORAGE_BUCKET = os.environ.get('FIREBASE_STORAGE_BUCKET', '')
-FIREBASE_MESSAGING_SENDER_ID = os.environ.get('FIREBASE_MESSAGING_SENDER_ID', '')
+FIREBASE_AUTH_DOMAIN = os.environ.get('FIREBASE_AUTH_DOMAIN', 'jpfinal-c9340.firebaseapp.com')
+FIREBASE_PROJECT_ID = os.environ.get('FIREBASE_PROJECT_ID', 'jpfinal-c9340')
+FIREBASE_STORAGE_BUCKET = os.environ.get('FIREBASE_STORAGE_BUCKET', 'jpfinal-c9340.firebasestorage.app')
+FIREBASE_MESSAGING_SENDER_ID = os.environ.get('FIREBASE_MESSAGING_SENDER_ID', '588713240952')
 FIREBASE_APP_ID = os.environ.get('FIREBASE_APP_ID', '')
 FIREBASE_MEASUREMENT_ID = os.environ.get('FIREBASE_MEASUREMENT_ID', '')
 FIREBASE_ENABLED = all([

@@ -109,7 +109,7 @@ DATABASE_URL        PostgreSQL connection string
 GEMINI_API_KEY      Google Gemini API key
 EMERGENT_API_KEY    Emergent/OpenAI-compatible API key
 VAPID_PUBLIC_KEY    Web push notifications
-FIREBASE_PROJECT_ID Firebase project (jayti-c7605)
+FIREBASE_PROJECT_ID Firebase project (jpfinal-c9340)
 ```
 
 ---
@@ -166,7 +166,7 @@ git push origin main   # triggers Cloud Build automatically
 Manual one-shot:
 ```bash
 gcloud run deploy jayti \
-  --image=asia-south1-docker.pkg.dev/jayti-c7605/jayti/app:latest \
+  --image=asia-south1-docker.pkg.dev/jpfinal-c9340/jayti/app:latest \
   --region=asia-south1 --platform=managed
 firebase deploy --only hosting
 ```
@@ -205,5 +205,5 @@ Install on phone: `adb install android/app/build/outputs/apk/debug/app-debug.apk
 3. **Preserve existing migrations** — never delete or squash migration files.
 4. **The astro module uses pyswisseph** — Swiss Ephemeris, not a REST API. Don't suggest replacing it.
 5. **Tangred is experimental** — the wardrobe AI feature, handle with care.
-6. **Firebase project ID is `jayti-c7605`** — use this when generating gcloud commands.
+6. **Firebase project ID is `jpfinal-c9340`** — use this when generating gcloud commands.
 7. **Region is `asia-south1` (Mumbai)** — all Cloud Run / Cloud SQL / Artifact Registry resources live here.

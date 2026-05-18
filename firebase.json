@@ -31,7 +31,8 @@
         "source": "**",
         "run": {
           "serviceId": "jayti",
-          "region": "asia-south1"
+          "region": "asia-south1",
+          "pinTag": true
         }
       }
     ]

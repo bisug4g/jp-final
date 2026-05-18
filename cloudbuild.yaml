@@ -13,7 +13,7 @@
 #   _REGION          → asia-south1
 #   _AR_REPO         → jayti           (Artifact Registry repo name)
 #   _SERVICE         → jayti           (Cloud Run service name)
-#   _CLOUDSQL_INST   → PROJECT:REGION:INSTANCE  (e.g. jayti-c7605:asia-south1:jayti-db)
+#   _CLOUDSQL_INST   → PROJECT:REGION:INSTANCE  (e.g. jpfinal-c9340:asia-south1:jayti-db)
 #
 # Secrets pulled from Secret Manager at deploy time (set --update-secrets in the
 # gcloud run deploy command below, or pass via --set-env-vars for non-secret values).
@@ -23,7 +23,7 @@ substitutions:
   _REGION: asia-south1
   _AR_REPO: jayti
   _SERVICE: jayti
-  _CLOUDSQL_INST: ''   # Set in Cloud Build trigger: PROJECT_ID:REGION:INSTANCE_NAME
+  _CLOUDSQL_INST: 'jpfinal-c9340:asia-south1:jayti-db'   # Set in Cloud Build trigger: PROJECT_ID:REGION:INSTANCE_NAME
 
 options:
   logging: CLOUD_LOGGING_ONLY

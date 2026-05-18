@@ -1,6 +1,8 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.google.gms.google-services")          // Firebase
+    id("com.google.firebase.crashlytics")         // Crashlytics
 }
 
 android {
@@ -75,6 +77,14 @@ dependencies {
     // Lifecycle
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.activity:activity-ktx:1.8.2")
+
+    // ─── Firebase (BOM manages all versions) ─────────────────────────────────
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    implementation("com.google.firebase:firebase-analytics-ktx")       // Analytics
+    implementation("com.google.firebase:firebase-crashlytics-ktx")     // Crash reporting
+    implementation("com.google.firebase:firebase-messaging-ktx")       // Push notifications (FCM)
+    implementation("com.google.firebase:firebase-storage-ktx")         // Firebase Storage (Tangred photos)
+    implementation("com.google.firebase:firebase-auth-ktx")            // Auth (future use)
 
     // ─── Unit tests ──────────────────────────────────────────────────────────
     testImplementation("junit:junit:4.13.2")
