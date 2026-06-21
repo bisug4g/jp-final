@@ -3,27 +3,23 @@
 # Triggered on every push to `main`.
 #
 # What it does:
-#   1. Build the Docker image
+#   1. Build the Docker image (Django / Cloud Run backend)
 #   2. Push to Artifact Registry
-#   3. Run Django deploy-check (smoke-test the image)
-#   4. Deploy to Cloud Run (asia-south1 / Mumbai — closest to jaytibirthday.in)
-#   5. Collect static files and deploy Firebase Hosting
+#   3. Django deploy-check (smoke test)
+#   4. Deploy Django to Cloud Run (asia-south1)
+#   5. Build React frontend (Vite → firebase-hosting/)
+#   6. Install Firebase Functions dependencies
+#   7. Deploy Firebase Functions + Firestore rules/indexes
+#   8. Deploy Firebase Hosting (React SPA)
 #
-# Required Cloud Build substitution variables (set in trigger config):
-#   _REGION          → asia-south1
-#   _AR_REPO         → jayti           (Artifact Registry repo name)
-#   _SERVICE         → jayti           (Cloud Run service name)
-#   _CLOUDSQL_INST   → PROJECT:REGION:INSTANCE  (e.g. jpfinal-c9340:asia-south1:jayti-db)
-#
-# Secrets pulled from Secret Manager at deploy time (set --update-secrets in the
-# gcloud run deploy command below, or pass via --set-env-vars for non-secret values).
+# Steps 1-4 and 5-8 run in parallel where possible.
 # ─────────────────────────────────────────────────────────────────────────────
 
 substitutions:
   _REGION: asia-south1
   _AR_REPO: jayti
   _SERVICE: jayti
-  _CLOUDSQL_INST: 'jpfinal-c9340:asia-south1:jayti-db'   # Set in Cloud Build trigger: PROJECT_ID:REGION:INSTANCE_NAME
+  _CLOUDSQL_INST: 'jpfinal-c9340:asia-south1:jayti-db'
 
 options:
   logging: CLOUD_LOGGING_ONLY
@@ -56,7 +52,7 @@ steps:
       - $_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO/app
     waitFor: [build]
 
-  # ── 3. Django deploy-check (fast smoke test inside the built image) ────────
+  # ── 3. Django deploy-check ────────────────────────────────────────────────
   - id: deploy-check
     name: $_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO/app:$COMMIT_SHA
     entrypoint: python
@@ -94,14 +90,9 @@ steps:
       - --concurrency=80
       - --timeout=300
       - --port=8080
-      # Cloud SQL Auth Proxy — attach the instance so Django can connect via
-      # Unix socket at /cloudsql/PROJECT:REGION:INSTANCE
       - --add-cloudsql-instances=$_CLOUDSQL_INST
-      # Non-secret env vars
       - --set-env-vars=PORT=8080,DEBUG=False,LOG_TO_FILE=0,TIME_ZONE=Asia/Kolkata,BIRTH_DATE_DAY=6,BIRTH_DATE_MONTH=2,EMERGENT_MODEL=claude-opus-4-6,GEMINI_MODEL=gemini-1.5-pro,TANGRED_PRIVATE_MEDIA_BACKEND=firebase
-      # Secrets are mounted from Secret Manager — add with:
-      #   --update-secrets=SECRET_KEY=jayti-secret-key:latest,DATABASE_URL=jayti-db-url:latest,...
-      # Uncomment and fill in after creating secrets (see LAUNCH_FIREBASE.md):
+      # Uncomment after creating secrets in Secret Manager:
       # - --update-secrets=SECRET_KEY=jayti-secret-key:latest
       # - --update-secrets=DATABASE_URL=jayti-database-url:latest
       # - --update-secrets=GEMINI_API_KEY=jayti-gemini-key:latest
@@ -117,24 +108,50 @@ steps:
       # - --update-secrets=FIREBASE_CLIENT_EMAIL=jayti-firebase-client-email:latest
     waitFor: [deploy-check]
 
-  # ── 5a. Collect static files ──────────────────────────────────────────────
-  - id: collectstatic
-    name: $_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO/app:$COMMIT_SHA
-    entrypoint: python
-    args:
-      - manage.py
-      - collectstatic
-      - --noinput
-      - --clear
-    env:
-      - DEBUG=False
-      - SECRET_KEY=ci-build-check-placeholder-not-used-at-runtime
-      - DATABASE_URL=sqlite:////tmp/check.db
-      - DJANGO_COLLECTSTATIC=1
-      - STATIC_ROOT=/workspace/firebase-hosting/static
-    waitFor: [push]
+  # ── 5. Build React frontend ───────────────────────────────────────────────
+  # Runs in parallel with the Docker build steps (no dependency on them).
+  - id: npm-install-frontend
+    name: node:20
+    entrypoint: npm
+    args: [install]
+    dir: frontend
+    waitFor: ['-']   # start immediately
 
-  # ── 5b. Deploy Firebase Hosting ───────────────────────────────────────────
+  - id: build-frontend
+    name: node:20
+    entrypoint: npm
+    args: [run, build]
+    dir: frontend
+    env:
+      - VITE_FIREBASE_API_KEY=AIzaSyCSrVXiA9_AR_Asp-1h4KeRTWxG0758KA4
+      - VITE_FIREBASE_AUTH_DOMAIN=jpfinal-c9340.firebaseapp.com
+      - VITE_FIREBASE_PROJECT_ID=jpfinal-c9340
+      - VITE_FIREBASE_STORAGE_BUCKET=jpfinal-c9340.firebasestorage.app
+      - VITE_FIREBASE_MESSAGING_SENDER_ID=588713240952
+      - VITE_FIREBASE_APP_ID=1:588713240952:web:a6bfb6013e3eea6efe008d
+      - VITE_API_URL=https://asia-south1-jpfinal-c9340.cloudfunctions.net/api
+    waitFor: [npm-install-frontend]
+
+  # ── 6. Install Firebase Functions dependencies ────────────────────────────
+  - id: npm-install-functions
+    name: node:20
+    entrypoint: npm
+    args: [install, --legacy-peer-deps]
+    dir: firebase-functions
+    waitFor: ['-']   # start immediately
+
+  # ── 7. Deploy Firebase Functions + Firestore ──────────────────────────────
+  - id: deploy-functions
+    name: gcr.io/firebase-tools/firebase
+    args:
+      - deploy
+      - --only
+      - functions,firestore
+      - --project=$PROJECT_ID
+    waitFor: [npm-install-functions]
+
+  # ── 8. Deploy Firebase Hosting ────────────────────────────────────────────
+  # Waits for the React build AND Functions deploy (so rewrites are live first).
   - id: deploy-hosting
     name: gcr.io/firebase-tools/firebase
     args:
@@ -142,10 +159,10 @@ steps:
       - --only
       - hosting
       - --project=$PROJECT_ID
-    waitFor: [collectstatic, deploy-cloudrun]
+    waitFor: [build-frontend, deploy-functions]
 
 images:
   - $_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO/app:$COMMIT_SHA
   - $_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO/app:latest
 
-timeout: 1800s   # 30 min — generous for slow cold-build layers
+timeout: 1800s
