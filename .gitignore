@@ -59,6 +59,7 @@ test_reports/
 # Node
 node_modules/
 yarn-error.log
+frontend/node_modules/
 firebase-debug.log
 .firebase/
 

@@ -9,8 +9,9 @@ Strategy
   session.
 * The ``page`` fixture yields an authenticated page (fresh login each test).
   Tests that need to exercise the login screen itself should use ``anon_page``.
-* The login is cheap (one form POST); for expensive workflows add targeted
-  fixtures that reuse an ``authed_context`` within a test.
+* The authenticated context uses Django's test client to create a real session
+  cookie. This avoids loading the dashboard before every test, which can leave
+  background API requests racing the next test's ORM setup under SQLite.
 """
 from __future__ import annotations
 
@@ -22,7 +23,9 @@ import os
 os.environ.setdefault("DJANGO_ALLOW_ASYNC_UNSAFE", "true")
 
 import pytest
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.test import Client
 
 E2E_USERNAME = os.environ.get("E2E_USERNAME", "e2e-tester")
 E2E_PASSWORD = os.environ.get("E2E_PASSWORD", "e2e-strong-password-123!")
@@ -58,14 +61,6 @@ def browser_context_args(browser_context_args):
     }
 
 
-def _login(page, base_url: str, creds: dict[str, str]) -> None:
-    page.goto(f"{base_url}/")
-    page.fill('input[name="username"]', creds["username"])
-    page.fill('input[name="password"]', creds["password"])
-    page.click('button[type="submit"]')
-    page.wait_for_url("**/dashboard/", timeout=15_000)
-
-
 @pytest.fixture
 def anon_context(browser, browser_context_args):
     """Anonymous (logged-out) browser context."""
@@ -83,11 +78,28 @@ def anon_page(anon_context):
 
 @pytest.fixture
 def authed_context(browser, browser_context_args, live_server, e2e_credentials):
-    """Browser context that has already logged in via the real UI."""
+    """Browser context authenticated with a real Django session cookie."""
     context = browser.new_context(**browser_context_args)
-    page = context.new_page()
-    _login(page, live_server.url, e2e_credentials)
-    page.close()
+
+    client = Client()
+    assert client.login(
+        username=e2e_credentials["username"],
+        password=e2e_credentials["password"],
+    ), "E2E fixture could not create an authenticated Django session"
+    session_cookie = client.cookies[settings.SESSION_COOKIE_NAME]
+
+    context.add_cookies(
+        [
+            {
+                "name": settings.SESSION_COOKIE_NAME,
+                "value": session_cookie.value,
+                "url": live_server.url,
+                "httpOnly": True,
+                "sameSite": "Lax",
+            }
+        ]
+    )
+
     yield context
     context.close()
 
@@ -96,6 +108,5 @@ def authed_context(browser, browser_context_args, live_server, e2e_credentials):
 def page(authed_context, live_server):
     """Authenticated page pointed at the live Django server."""
     page = authed_context.new_page()
-    page.goto(live_server.url)
     yield page
     page.close()

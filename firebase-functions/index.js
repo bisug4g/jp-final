@@ -1,70 +1,33 @@
 const { onRequest } = require("firebase-functions/v2/https");
-const logger = require("firebase-functions/logger");
+const express = require("express");
+const cors = require("cors");
 
-const RAILWAY_ORIGIN =
-  process.env.RAILWAY_ORIGIN || "https://jp-production-3f28.up.railway.app";
+const notesRouter = require("./lib/notes");
+const diaryRouter = require("./lib/diary");
+const goalsRouter = require("./lib/goals");
+const chatRouter = require("./lib/chat");
+const dashboardRouter = require("./lib/dashboard");
 
-const HOP_BY_HOP_HEADERS = new Set([
-  "connection",
-  "content-encoding",
-  "content-length",
-  "host",
-  "transfer-encoding",
-]);
+const app = express();
 
-exports.railwayProxy = onRequest(
+app.use(cors({ origin: true, credentials: true }));
+app.use(express.json());
+
+app.use("/notes", notesRouter);
+app.use("/diary", diaryRouter);
+app.use("/goals", goalsRouter);
+app.use("/chat", chatRouter);
+app.use("/dashboard", dashboardRouter);
+
+app.get("/health", (_req, res) => res.json({ ok: true }));
+
+exports.api = onRequest(
   {
-    region: "europe-west1",
+    region: "asia-south1",
     timeoutSeconds: 60,
-    memory: "256MiB",
+    memory: "512MiB",
     invoker: "public",
+    secrets: ["GEMINI_API_KEY"],
   },
-  async (req, res) => {
-    const upstreamUrl = new URL(req.originalUrl || req.url, RAILWAY_ORIGIN);
-    const headers = new Headers();
-
-    for (const [key, value] of Object.entries(req.headers)) {
-      if (value === undefined || HOP_BY_HOP_HEADERS.has(key.toLowerCase())) {
-        continue;
-      }
-
-      headers.set(key, Array.isArray(value) ? value.join(", ") : value);
-    }
-
-    headers.set("host", upstreamUrl.host);
-    headers.set("x-forwarded-host", req.headers.host || "");
-    headers.set("x-forwarded-proto", "https");
-
-    if (req.ip) {
-      headers.set("x-forwarded-for", req.ip);
-    }
-
-    const method = req.method.toUpperCase();
-    const upstreamResponse = await fetch(upstreamUrl, {
-      method,
-      headers,
-      body: method === "GET" || method === "HEAD" ? undefined : req.rawBody,
-      redirect: "manual",
-    });
-
-    res.status(upstreamResponse.status);
-
-    upstreamResponse.headers.forEach((value, key) => {
-      if (!HOP_BY_HOP_HEADERS.has(key.toLowerCase())) {
-        res.setHeader(key, value);
-      }
-    });
-
-    if (typeof upstreamResponse.headers.getSetCookie === "function") {
-      const cookies = upstreamResponse.headers.getSetCookie();
-      if (cookies.length) {
-        res.setHeader("set-cookie", cookies);
-      }
-    }
-
-    const body = Buffer.from(await upstreamResponse.arrayBuffer());
-    res.send(body);
-  }
+  app
 );
-
-logger.info("Firebase Hosting proxy configured", { railwayOrigin: RAILWAY_ORIGIN });
