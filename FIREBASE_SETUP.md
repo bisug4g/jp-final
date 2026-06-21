@@ -1,10 +1,10 @@
 # Firebase Full-Stack Setup
 
-## Project: jpfinal-c9340
+## Project: jpfinal-bisu-2026
 
 ## 1. Enable Firebase services
 
-In the Firebase console for `jpfinal-c9340`:
+In the Firebase console for `jpfinal-bisu-2026`:
 - **Authentication** → Enable Email/Password provider
 - **Firestore** → Create database (production mode, asia-south1)
 - **Functions** → Already configured
@@ -15,12 +15,12 @@ Copy `frontend/.env.example` to `frontend/.env.local` and fill in values from Fi
 
 ```
 VITE_FIREBASE_API_KEY=<from console>
-VITE_FIREBASE_AUTH_DOMAIN=jpfinal-c9340.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=jpfinal-c9340
-VITE_FIREBASE_STORAGE_BUCKET=jpfinal-c9340.appspot.com
+VITE_FIREBASE_AUTH_DOMAIN=jpfinal-bisu-2026.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=jpfinal-bisu-2026
+VITE_FIREBASE_STORAGE_BUCKET=jpfinal-bisu-2026.appspot.com
 VITE_FIREBASE_MESSAGING_SENDER_ID=<from console>
 VITE_FIREBASE_APP_ID=<from console>
-VITE_API_URL=https://asia-south1-jpfinal-c9340.cloudfunctions.net/api
+VITE_API_URL=https://asia-south1-jpfinal-bisu-2026.cloudfunctions.net/api
 ```
 
 ## 3. Add Gemini API key to Firebase secrets

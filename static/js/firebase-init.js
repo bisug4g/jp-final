@@ -1,14 +1,16 @@
-// Firebase SDK initialisation — project: jpfinal-c9340
+// Firebase SDK initialisation — project: jpfinal-bisu-2026
 // Config is injected by Django context processor (firebase_config).
 // The hardcoded fallback below is safe to expose (public web config).
+// TODO: Replace REPLACE_WITH_* values with the actual web app config from
+//       Firebase console → Project Settings → Your apps → Web app.
 
 const FIREBASE_FALLBACK = {
-  apiKey: "AIzaSyCSrVXiA9_AR_Asp-1h4KeRTWxG0758KA4",
-  authDomain: "jpfinal-c9340.firebaseapp.com",
-  projectId: "jpfinal-c9340",
-  storageBucket: "jpfinal-c9340.firebasestorage.app",
-  messagingSenderId: "588713240952",
-  appId: "1:588713240952:web:a6bfb6013e3eea6efe008d"
+  apiKey: "REPLACE_WITH_FIREBASE_API_KEY",
+  authDomain: "jpfinal-bisu-2026.firebaseapp.com",
+  projectId: "jpfinal-bisu-2026",
+  storageBucket: "jpfinal-bisu-2026.firebasestorage.app",
+  messagingSenderId: "REPLACE_WITH_MESSAGING_SENDER_ID",
+  appId: "REPLACE_WITH_FIREBASE_APP_ID"
 };
 
 window.JaytiFirebase = { enabled: false, analyticsEnabled: false, config: null };
@@ -47,7 +49,7 @@ window.JaytiFirebase = { enabled: false, analyticsEnabled: false, config: null }
 
     window.JaytiFirebase.app     = app;
     window.JaytiFirebase.enabled = true;
-    console.info('[Firebase] Initialised — project: jpfinal-c9340');
+    console.info('[Firebase] Initialised — project: jpfinal-bisu-2026');
 
     // Analytics — only if measurementId is set
     if (config.measurementId) {

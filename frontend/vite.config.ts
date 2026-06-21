@@ -17,7 +17,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       "/api": {
-        target: "http://127.0.0.1:5001/jpfinal-c9340/asia-south1/api",
+        target: "http://127.0.0.1:5001/jpfinal-bisu-2026/asia-south1/api",
         changeOrigin: true,
         rewrite: (p) => p.replace(/^\/api/, ""),
       },

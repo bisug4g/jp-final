@@ -16,7 +16,7 @@ Browser → Firebase Hosting (jaytibirthday.in, SSL, CDN, static files)
 
 ## Prerequisites
 
-- Google account with a Firebase project already created (`jpfinal-c9340`)
+- Google account with a Firebase project already created (`jpfinal-bisu-2026`)
 - `gcloud` CLI installed: https://cloud.google.com/sdk/docs/install
 - `firebase` CLI installed: `npm install -g firebase-tools`
 - Docker (only for local testing — Cloud Build handles production builds)
@@ -26,7 +26,7 @@ Browser → Firebase Hosting (jaytibirthday.in, SSL, CDN, static files)
 ## Step 1 — Enable Google Cloud APIs
 
 ```bash
-gcloud config set project jpfinal-c9340
+gcloud config set project jpfinal-bisu-2026
 
 gcloud services enable \
   run.googleapis.com \
@@ -76,12 +76,12 @@ gcloud sql users create jayti \
 
 The **Cloud SQL connection name** (needed later) is:
 ```
-jpfinal-c9340:asia-south1:jayti-db
+jpfinal-bisu-2026:asia-south1:jayti-db
 ```
 
 The `DATABASE_URL` for Cloud Run (Unix socket format):
 ```
-postgresql://jayti:REPLACE_WITH_STRONG_PASSWORD@/jayti?host=/cloudsql/jpfinal-c9340:asia-south1:jayti-db
+postgresql://jayti:REPLACE_WITH_STRONG_PASSWORD@/jayti?host=/cloudsql/jpfinal-bisu-2026:asia-south1:jayti-db
 ```
 
 ---
@@ -101,7 +101,7 @@ create_secret() {
 DJANGO_KEY=$(python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())")
 
 create_secret jayti-secret-key        "$DJANGO_KEY"
-create_secret jayti-database-url      "postgresql://jayti:YOUR_DB_PASS@/jayti?host=/cloudsql/jpfinal-c9340:asia-south1:jayti-db"
+create_secret jayti-database-url      "postgresql://jayti:YOUR_DB_PASS@/jayti?host=/cloudsql/jpfinal-bisu-2026:asia-south1:jayti-db"
 create_secret jayti-username          "jayati"
 create_secret jayti-password          "REPLACE_WITH_STRONG_PASSWORD"
 create_secret jayti-gemini-key        "YOUR_GEMINI_API_KEY"
@@ -116,7 +116,7 @@ create_secret jayti-vapid-public      "YOUR_VAPID_PUBLIC_KEY"
 # Firebase web config (from Firebase console → Project settings → Your apps)
 create_secret jayti-firebase-api-key          "YOUR_FIREBASE_API_KEY"
 create_secret jayti-firebase-app-id          "YOUR_FIREBASE_APP_ID"
-create_secret jayti-firebase-project-id      "jpfinal-c9340"
+create_secret jayti-firebase-project-id      "jpfinal-bisu-2026"
 
 # Firebase Admin SDK (from Firebase console → Project settings → Service accounts → Generate new private key)
 create_secret jayti-firebase-private-key      "$(cat firebase-adminsdk-key.json | python -c "import json,sys; k=json.load(sys.stdin); print(k['private_key'])")"
@@ -125,9 +125,9 @@ create_secret jayti-firebase-client-email     "$(cat firebase-adminsdk-key.json 
 
 **Grant Cloud Run access to secrets:**
 ```bash
-PROJECT_NUMBER=$(gcloud projects describe jpfinal-c9340 --format='value(projectNumber)')
+PROJECT_NUMBER=$(gcloud projects describe jpfinal-bisu-2026 --format='value(projectNumber)')
 
-gcloud projects add-iam-policy-binding jpfinal-c9340 \
+gcloud projects add-iam-policy-binding jpfinal-bisu-2026 \
   --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
   --role="roles/secretmanager.secretAccessor"
 ```
@@ -158,7 +158,7 @@ Open `cloudbuild.yaml` and **uncomment** the `--update-secrets` lines in the
 Also set `_CLOUDSQL_INST` substitution:
 ```yaml
 substitutions:
-  _CLOUDSQL_INST: jpfinal-c9340:asia-south1:jayti-db
+  _CLOUDSQL_INST: jpfinal-bisu-2026:asia-south1:jayti-db
 ```
 
 ---
@@ -177,31 +177,31 @@ gcloud builds triggers create github \
 
 **Grant Cloud Build permissions:**
 ```bash
-PROJECT_NUMBER=$(gcloud projects describe jpfinal-c9340 --format='value(projectNumber)')
+PROJECT_NUMBER=$(gcloud projects describe jpfinal-bisu-2026 --format='value(projectNumber)')
 CB_SA="${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com"
 
 # Cloud Run Admin
-gcloud projects add-iam-policy-binding jpfinal-c9340 \
+gcloud projects add-iam-policy-binding jpfinal-bisu-2026 \
   --member="serviceAccount:${CB_SA}" --role="roles/run.admin"
 
 # Cloud SQL Client
-gcloud projects add-iam-policy-binding jpfinal-c9340 \
+gcloud projects add-iam-policy-binding jpfinal-bisu-2026 \
   --member="serviceAccount:${CB_SA}" --role="roles/cloudsql.client"
 
 # Artifact Registry Writer
-gcloud projects add-iam-policy-binding jpfinal-c9340 \
+gcloud projects add-iam-policy-binding jpfinal-bisu-2026 \
   --member="serviceAccount:${CB_SA}" --role="roles/artifactregistry.writer"
 
 # Secret Manager Accessor
-gcloud projects add-iam-policy-binding jpfinal-c9340 \
+gcloud projects add-iam-policy-binding jpfinal-bisu-2026 \
   --member="serviceAccount:${CB_SA}" --role="roles/secretmanager.secretAccessor"
 
 # Firebase Hosting Admin
-gcloud projects add-iam-policy-binding jpfinal-c9340 \
+gcloud projects add-iam-policy-binding jpfinal-bisu-2026 \
   --member="serviceAccount:${CB_SA}" --role="roles/firebasehosting.admin"
 
 # Service Account User (needed to deploy Cloud Run)
-gcloud projects add-iam-policy-binding jpfinal-c9340 \
+gcloud projects add-iam-policy-binding jpfinal-bisu-2026 \
   --member="serviceAccount:${CB_SA}" \
   --role="roles/iam.serviceAccountUser"
 ```
@@ -222,7 +222,7 @@ git push origin main
 ```
 
 Watch the build at:
-https://console.cloud.google.com/cloud-build/builds?project=jpfinal-c9340
+https://console.cloud.google.com/cloud-build/builds?project=jpfinal-bisu-2026
 
 The pipeline:
 1. Builds the Docker image (~3 min)
@@ -243,7 +243,7 @@ The pipeline:
 
 ### Firebase Hosting domain
 ```bash
-firebase hosting:channel:deploy live --project jpfinal-c9340
+firebase hosting:channel:deploy live --project jpfinal-bisu-2026
 
 # Add custom domain in Firebase console:
 # Hosting → Add custom domain → jaytibirthday.in
@@ -261,7 +261,7 @@ In your DNS registrar, add:
 Type    Name    Value
 A       @       151.101.1.195     ← Firebase provides these IPs
 A       @       151.101.65.195
-CNAME   www     jpfinal-c9340.web.app
+CNAME   www     jpfinal-bisu-2026.web.app
 ```
 
 SSL is auto-provisioned by Firebase within ~15 minutes.

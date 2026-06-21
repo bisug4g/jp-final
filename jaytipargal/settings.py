@@ -464,13 +464,13 @@ VAPID_PRIVATE_KEY = os.environ.get('VAPID_PRIVATE_KEY', '')
 VAPID_PUBLIC_KEY = os.environ.get('VAPID_PUBLIC_KEY', '')
 VAPID_ADMIN_EMAIL = os.environ.get('VAPID_ADMIN_EMAIL', 'admin@jaytibirthday.in')
 
-# ── Firebase (project: jpfinal-c9340) ────────────────────────────────────────
+# ── Firebase (project: jpfinal-bisu-2026) ────────────────────────────────────────
 FIREBASE_API_KEY = os.environ.get('FIREBASE_API_KEY', '')
-FIREBASE_AUTH_DOMAIN = os.environ.get('FIREBASE_AUTH_DOMAIN', 'jpfinal-c9340.firebaseapp.com')
-FIREBASE_PROJECT_ID = os.environ.get('FIREBASE_PROJECT_ID', 'jpfinal-c9340')
-FIREBASE_STORAGE_BUCKET = os.environ.get('FIREBASE_STORAGE_BUCKET', 'jpfinal-c9340.firebasestorage.app')
-FIREBASE_MESSAGING_SENDER_ID = os.environ.get('FIREBASE_MESSAGING_SENDER_ID', '588713240952')
-FIREBASE_APP_ID = os.environ.get('FIREBASE_APP_ID', '1:588713240952:web:a6bfb6013e3eea6efe008d')
+FIREBASE_AUTH_DOMAIN = os.environ.get('FIREBASE_AUTH_DOMAIN', 'jpfinal-bisu-2026.firebaseapp.com')
+FIREBASE_PROJECT_ID = os.environ.get('FIREBASE_PROJECT_ID', 'jpfinal-bisu-2026')
+FIREBASE_STORAGE_BUCKET = os.environ.get('FIREBASE_STORAGE_BUCKET', 'jpfinal-bisu-2026.firebasestorage.app')
+FIREBASE_MESSAGING_SENDER_ID = os.environ.get('FIREBASE_MESSAGING_SENDER_ID', '')
+FIREBASE_APP_ID = os.environ.get('FIREBASE_APP_ID', '')
 FIREBASE_MEASUREMENT_ID = os.environ.get('FIREBASE_MEASUREMENT_ID', '')
 FIREBASE_ENABLED = all([
     FIREBASE_API_KEY,
@@ -481,7 +481,7 @@ FIREBASE_ENABLED = all([
 # Firebase Admin configuration for Railway-hosted backend integrations
 FIREBASE_PRIVATE_KEY_ID = os.environ.get('FIREBASE_PRIVATE_KEY_ID', '')
 FIREBASE_PRIVATE_KEY = os.environ.get('FIREBASE_PRIVATE_KEY', '').replace('\\n', '\n')
-FIREBASE_CLIENT_EMAIL = os.environ.get('FIREBASE_CLIENT_EMAIL', 'firebase-adminsdk-fbsvc@jpfinal-c9340.iam.gserviceaccount.com')
+FIREBASE_CLIENT_EMAIL = os.environ.get('FIREBASE_CLIENT_EMAIL', 'firebase-adminsdk-fbsvc@jpfinal-bisu-2026.iam.gserviceaccount.com')
 FIREBASE_CLIENT_ID = os.environ.get('FIREBASE_CLIENT_ID', '105251916594792438445')
 FIREBASE_AUTH_URI = os.environ.get('FIREBASE_AUTH_URI', 'https://accounts.google.com/o/oauth2/auth')
 FIREBASE_TOKEN_URI = os.environ.get('FIREBASE_TOKEN_URI', 'https://oauth2.googleapis.com/token')
@@ -489,7 +489,7 @@ FIREBASE_AUTH_PROVIDER_CERT_URL = os.environ.get(
     'FIREBASE_AUTH_PROVIDER_CERT_URL',
     'https://www.googleapis.com/oauth2/v1/certs',
 )
-FIREBASE_CLIENT_CERT_URL = os.environ.get('FIREBASE_CLIENT_CERT_URL', 'https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40jpfinal-c9340.iam.gserviceaccount.com')
+FIREBASE_CLIENT_CERT_URL = os.environ.get('FIREBASE_CLIENT_CERT_URL', 'https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40jpfinal-bisu-2026.iam.gserviceaccount.com')
 
 # SSL/HTTPS settings for production
 if not DEBUG:

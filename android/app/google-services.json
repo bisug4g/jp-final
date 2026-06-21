@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "588713240952",
-    "project_id": "jpfinal-c9340",
-    "storage_bucket": "jpfinal-c9340.firebasestorage.app"
+    "project_number": "REPLACE_WITH_PROJECT_NUMBER",
+    "project_id": "jpfinal-bisu-2026",
+    "storage_bucket": "jpfinal-bisu-2026.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:588713240952:android:c585bf5d532a9026fe008d",
+        "mobilesdk_app_id": "REPLACE_WITH_ANDROID_APP_ID",
         "android_client_info": {
           "package_name": "com.jayti.companion"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyB2dqp4pDi2weJhlIBcsHZeDHzLDWCyLe0"
+          "current_key": "REPLACE_WITH_ANDROID_API_KEY"
         }
       ],
       "services": {

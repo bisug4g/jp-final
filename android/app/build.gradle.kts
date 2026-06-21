@@ -23,7 +23,7 @@ android {
         debug {
             isDebuggable = true
             // No applicationIdSuffix — keeps com.jayti.companion matching google-services.json
-            buildConfigField("String", "APP_URL", "\"https://jpfinal-c9340.web.app\"")
+            buildConfigField("String", "APP_URL", "\"https://jpfinal-bisu-2026.web.app\"")
             buildConfigField("String", "ENV", "\"debug\"")
         }
         release {
